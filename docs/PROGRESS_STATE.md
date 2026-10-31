@@ -8,10 +8,10 @@
 | Milestone | Scope | Status |
 | --- | --- | --- |
 | M0: Foundation | Development environment, WPF starter window, Git, and README | Complete |
-| M1: Notes and persistence | Editable notes, local JSON storage, autosave, and window restoration | Implemented (pending Windows verification) |
-| M2: Content blocks | Pasted images, safe website links, and checklists | Implemented (pending Windows verification) |
-| M3: Theme Studio | Presets, live preview, and per-note customization | Implemented (pending Windows verification) |
-| M4: Desktop integration and release | Tray controls, opt-in startup, recovery, and Windows distribution | Integration implemented (pending Windows verification); packaging planned |
+| M1: Notes and persistence | Editable notes, local JSON storage, autosave, and window restoration | Implemented and Windows smoke-tested |
+| M2: Content blocks | Pasted images, safe website links, and checklists | Implemented and Windows smoke-tested |
+| M3: Theme Studio | Presets, live preview, and per-note customization | Implemented and Windows smoke-tested |
+| M4: Desktop integration and release | Tray controls, opt-in startup, recovery, and Windows distribution | Integration implemented and Windows smoke-tested; packaging planned |
 
 ## Implemented on `devin/dikit-v1-ios-notes` (M1)
 
@@ -54,8 +54,9 @@
 
 ## Verification status
 
-- **Not yet verified:** `dotnet build` and runtime behavior — this branch was developed on Linux without a Windows/WPF-capable .NET SDK, so compilation and UX have not been exercised.
-- **To verify on Windows:** build and launch; create/edit/move/resize/minimize/close notes; restart and confirm content, geometry, open state, and topmost restore; corrupt a `note.json` and confirm backup recovery plus the All notes warning; paste a screenshot and confirm it reloads after restart; open an `https://` link and confirm a `javascript:`/`file:` URL cannot be opened; toggle checklists and confirm persistence; edit themes per-note and globally with live preview and confirm persistence across restart; confirm the tray menu items and that closing windows keeps Dikit in the tray; toggle launch-at-sign-in and confirm the `Run` value appears/disappears and notes restore after sign-in; launch a second instance and confirm the first instance's All notes window activates; detach a monitor and confirm notes are clamped back on-screen.
+- **Verified on Windows (.NET 10.0.403):** `dotnet restore` and `dotnet build` pass with zero errors; clean launch shows the welcome note and All notes list; note create/edit/drag/resize/minimize-restore/pin/close-as-hide/reopen works; text, checklist, link and image blocks render; checklist state persists; the image asset is stored under `notes/<id>/assets/`; Theme Studio presets, hex colors, sliders, live preview, per-note and global application persist; the tray menu, Hide all/Restore all, Settings and Quit work; restarting reopened both notes with content, position, pin, theme, checklist and image intact; `manifest.json`, `app-settings.json`, `notes/<id>/note.json`, backups and logs were created under the expected `Dikit` data root.
+- **Windows verification fixes:** `5c0f29a` fixed .NET 10 markup/global-usings compile errors; `e3e0bdc` fixed a `Run.Text` two-way binding crash that hid notes and flooded `dikit.log`, a theme-override aliasing bug, and minimize-time geometry capture.
+- **Still to verify before release:** `Open ↗` browser launch, duplicate/delete UX, `Ctrl+V` clipboard paste, second-instance activation, corrupt-file backup/quarantine recovery, launch-at-sign-in registry behavior, monitor-detach clamping, forced termination, offline/Wi-Fi-disabled workflow, resource usage, and Windows packaging/distribution.
 
 ## Remaining for later milestones
 

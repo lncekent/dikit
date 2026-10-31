@@ -8,7 +8,7 @@ Designed for students, developers, and anyone who wants quick references beside 
 
 ## Project status
 
-**Early development.** On `devin/dikit-v1-ios-notes`, M1–M4's desktop-integration scope is implemented: editable sticky-note windows with typed content blocks (text, images, links, checklists), debounced autosave to local JSON, independent movable/resizable/minimizable note windows, close-as-hide, pin-to-top, window-state restoration with off-screen recovery, backups and quarantine recovery, a searchable All notes window, a system-tray menu, an opt-in launch-at-sign-in setting, single-instance activation, and a Theme Studio with presets and per-note/global customization. Compilation and runtime behavior still need verification on Windows (see [progress state](docs/PROGRESS_STATE.md)).
+**Early development.** On `devin/dikit-v1-ios-notes`, M1–M4's desktop-integration scope is implemented and passed a Windows smoke test: editable sticky-note windows with typed content blocks (text, images, links, checklists), debounced autosave to local JSON, independent movable/resizable/minimizable note windows, close-as-hide, pin-to-top, window-state restoration with off-screen recovery, backups and quarantine recovery, a searchable All notes window, a system-tray menu, an opt-in launch-at-sign-in setting, single-instance activation, and a Theme Studio with presets and per-note/global customization. See [progress state](docs/PROGRESS_STATE.md) for verified coverage and remaining checks.
 
 ## Implemented (M1–M4, branch)
 
@@ -74,10 +74,10 @@ Use `dotnet run --no-build` only after a successful build. For setup checks and 
 | Milestone | Scope | Status |
 | --- | --- | --- |
 | M0: Foundation | Development environment, WPF starter window, Git, and README | Complete |
-| M1: Notes and persistence | Editable notes, local JSON storage, autosave, and window restoration | Implemented on `devin/dikit-v1-ios-notes` (pending Windows verification) |
-| M2: Content blocks | Pasted images, safe website links, and checklists | Implemented on `devin/dikit-v1-ios-notes` (pending Windows verification) |
-| M3: Theme Studio | Presets, live preview, and per-note customization | Implemented on `devin/dikit-v1-ios-notes` (pending Windows verification) |
-| M4: Desktop integration and release | Tray controls, opt-in startup, recovery, and Windows distribution | Integration implemented on `devin/dikit-v1-ios-notes` (pending Windows verification); packaging planned |
+| M1: Notes and persistence | Editable notes, local JSON storage, autosave, and window restoration | Implemented on `devin/dikit-v1-ios-notes` and Windows smoke-tested |
+| M2: Content blocks | Pasted images, safe website links, and checklists | Implemented on `devin/dikit-v1-ios-notes` and Windows smoke-tested |
+| M3: Theme Studio | Presets, live preview, and per-note customization | Implemented on `devin/dikit-v1-ios-notes` and Windows smoke-tested |
+| M4: Desktop integration and release | Tray controls, opt-in startup, recovery, and Windows distribution | Integration implemented on `devin/dikit-v1-ios-notes` and Windows smoke-tested; packaging planned |
 
 ## Development
 
