@@ -12,6 +12,9 @@
 
   <ItemGroup>
     <Resource Include="Resources\dikit.ico" />
+    <Resource Include="Resources\Fonts\Inter-Regular.ttf" />
+    <Resource Include="Resources\Fonts\Inter-SemiBold.ttf" />
+    <Resource Include="Resources\Fonts\Inter-Bold.ttf" />
   </ItemGroup>
 
 </Project>
