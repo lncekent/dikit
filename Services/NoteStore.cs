@@ -245,7 +245,11 @@ public sealed class NoteStore
         note.SchemaVersion = Note.CurrentSchemaVersion;
         note.UpdatedUtc = DateTimeOffset.UtcNow;
         WriteNoteFile(note);
-        _assets.DeleteUnreferencedAssets(note.Id, CollectReferencedAssetIds(note));
+        if (TryCollectReferencedAssetIds(note, out HashSet<string> referencedAssetIds))
+        {
+            _assets.DeleteUnreferencedAssets(note.Id, referencedAssetIds);
+        }
+
         UpsertManifestEntry(note);
         WriteManifest();
     }
@@ -281,15 +285,15 @@ public sealed class NoteStore
         AtomicFileWriter.WriteAllText(file, JsonSerializer.Serialize(note, JsonOptions.Default));
     }
 
-    private HashSet<string> CollectReferencedAssetIds(Note note)
+    private bool TryCollectReferencedAssetIds(Note note, out HashSet<string> referenced)
     {
-        HashSet<string> referenced = ImageAssetIds(note).ToHashSet(StringComparer.OrdinalIgnoreCase);
+        referenced = ImageAssetIds(note).ToHashSet(StringComparer.OrdinalIgnoreCase);
         string backupDir = _paths.NoteBackupsDirectory(note.Id);
         try
         {
             if (!Directory.Exists(backupDir))
             {
-                return referenced;
+                return true;
             }
 
             foreach (string backup in Directory.EnumerateFiles(backupDir, "*.json"))
@@ -306,14 +310,16 @@ public sealed class NoteStore
                 catch (Exception ex) when (ex is IOException or JsonException
                     or NotSupportedException or UnauthorizedAccessException)
                 {
+                    return false;
                 }
             }
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
         {
+            return false;
         }
 
-        return referenced;
+        return true;
     }
 
     private static IEnumerable<string> ImageAssetIds(Note note)
