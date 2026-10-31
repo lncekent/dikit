@@ -212,9 +212,9 @@ Keep the source code, `.csproj`, `.xaml`, `.cs`, documentation, and any intentio
 
 ## 10. Current status and next milestone
 
-**Completed:** .NET 10 SDK recognized; C# tooling initialized; Dikit WPF project successfully launched.
+**Completed:** .NET 10 SDK recognized; C# tooling initialized; Dikit WPF project successfully launched. On `devin/dikit-v1-ios-notes`, M1 is implemented (editable notes, JSON persistence, autosave, window restoration) but has not yet been compiled or run — that branch was written on Linux where the WPF Windows Desktop SDK is unavailable.
 
-**Next:** Build a single editable sticky note, save it locally, close Dikit, reopen it, and verify that its content remains intact.
+**Next:** On Windows, run `dotnet restore && dotnet build && dotnet run` on the M1 branch; create and edit notes; restart and verify content, geometry, and open state persist. Then start M2 (images, links, checklists).
 
 ---
 

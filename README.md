@@ -8,17 +8,21 @@ Designed for students, developers, and anyone who wants quick references beside 
 
 ## Project status
 
-**Early development.** The .NET 10 WPF project is set up and the starter window launches. Note editing, storage, and the features below are planned; they are not available yet.
+**Early development.** On `devin/dikit-v1-ios-notes`, M1 is implemented: editable sticky-note windows with text blocks, debounced autosave to local JSON, independent movable/resizable/minimizable note windows, close-as-hide, pin-to-top, window-state restoration with off-screen recovery, backups, and a launcher window. Compilation and runtime behavior still need verification on Windows (see [progress state](docs/PROGRESS_STATE.md)).
+
+## Implemented (M1, branch)
+
+- Create, edit, duplicate, and delete notes; deleting keeps a recoverable copy under `backups/deleted/`.
+- Text notes that autosave automatically; closing a note hides it without deleting it.
+- Independent note windows that restore position, size, open state, and pin status.
+- Local storage under `%LOCALAPPDATA%\Dikit` (per-note JSON, manifest, settings, backups).
+- Theme presets resolved per note (Classic Yellow, Lavender, Matcha, Sakura, Midnight); customization UI comes with M3.
 
 ## Planned features
 
-- Create, edit, duplicate, and delete independent, movable note windows.
-- Mix text, pasted screenshots, website links, and checklists.
-- Save automatically and restore note content, size, position, and appearance.
-- Choose theme presets or customize colors, fonts, corners, and opacity per note.
-- Pin notes above other windows and manage them from the system tray.
-- Opt in to launch at Windows sign-in.
-- Keep notes and image assets on-device, with local backups and recovery.
+- Mix pasted screenshots, clickable website links, and checklists in notes (models exist; UI lands in M2).
+- Customize colors, fonts, corners, and opacity per note with live preview (M3).
+- Manage notes from the system tray and opt in to launch at Windows sign-in (M4).
 
 See the [product requirements](docs/PRD/V1.0.md) for scope, acceptance criteria, and open decisions.
 
@@ -65,16 +69,16 @@ Use `dotnet run --no-build` only after a successful build. For setup checks and 
 | Milestone | Scope | Status |
 | --- | --- | --- |
 | M0: Foundation | Development environment, WPF starter window, Git, and README | Complete |
-| M1: Notes and persistence | Editable notes, local JSON storage, autosave, and window restoration | Next |
+| M1: Notes and persistence | Editable notes, local JSON storage, autosave, and window restoration | Implemented on `devin/dikit-v1-ios-notes` (pending Windows verification) |
 | M2: Content blocks | Pasted images, safe website links, and checklists | Planned |
 | M3: Theme Studio | Presets, live preview, and per-note customization | Planned |
 | M4: Desktop integration and release | Tray controls, opt-in startup, recovery, and Windows distribution | Planned |
 
 ## Development
 
-Dikit uses **C#, WPF/XAML, and .NET 10**. The planned architecture uses MVVM to separate interface and application state, with services for persistence, themes, assets, and desktop integration. Build these layers incrementally as features need them.
+Dikit uses **C#, WPF/XAML, and .NET 10** with an MVVM structure: `Models/`, `ViewModels/`, `Views/`, `Services/` (persistence), and `Infrastructure/` (paths, atomic file writes, debouncing, MVVM helpers). There are no external package dependencies.
 
-The proposed storage location is `%LOCALAPPDATA%\Dikit`, using JSON note records and local image assets. Persistence is not implemented yet. Accounts, cloud sync, collaboration, AI features, and telemetry are outside the MVP scope.
+Notes persist under `%LOCALAPPDATA%\Dikit` as per-note JSON (`notes/<id>/note.json`), a `manifest.json`, `app-settings.json`, rolling per-note backups, and `backups/deleted`/`backups/quarantine` recovery folders. Accounts, cloud sync, collaboration, AI features, and telemetry are outside the MVP scope.
 
 Before contributing, read the [PRD](docs/PRD/V1.0.md) and [development guide](docs/DEVELOPMENT_SETUP.md). Keep changes focused on the current milestone and document confirmed behavior. Commit source files and project configuration; leave generated `bin/` and `obj/` folders out of version control.
 
