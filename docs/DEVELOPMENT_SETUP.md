@@ -212,9 +212,9 @@ Keep the source code, `.csproj`, `.xaml`, `.cs`, documentation, and any intentio
 
 ## 10. Current status and next milestone
 
-**Completed:** .NET 10 SDK recognized; C# tooling initialized; Dikit WPF project successfully launched. On `devin/dikit-v1-ios-notes`, M1–M3 are implemented (notes with typed blocks, JSON persistence, autosave, window restoration, image/link/checklist blocks, Theme Studio with per-note and global customization) but have not yet been compiled or run — that branch was written on Linux where the WPF Windows Desktop SDK is unavailable.
+**Completed:** .NET 10 SDK recognized; C# tooling initialized; Dikit WPF project successfully launched. On `devin/dikit-v1-ios-notes`, M1–M3 plus M4 desktop integration are implemented (notes with typed blocks, JSON persistence, autosave, window restoration, image/link/checklist blocks, Theme Studio, system-tray menu with explicit Quit, searchable All notes, Settings with opt-in launch-at-sign-in, single instance, backup/quarantine recovery, `logs/` error logging) but have not yet been compiled or run — that branch was written on Linux where the WPF Windows Desktop SDK is unavailable. The project now also enables `UseWindowsForms` for the tray icon; this uses the shared Windows Desktop framework and needs no extra installer.
 
-**Next:** On Windows, run `dotnet restore && dotnet build && dotnet run` on the branch; create and edit notes; paste a screenshot; add and open an `https://` link; toggle checklists; apply themes per note and globally; restart and verify content, geometry, open state, checked state, assets, and themes persist. Then start M4 (tray, opt-in startup, single instance, release packaging).
+**Next:** On Windows, run `dotnet restore && dotnet build && dotnet run` on the branch; create and edit notes; paste a screenshot; add and open an `https://` link; toggle checklists; apply themes per note and globally; exercise the tray menu, Settings toggle, and single-instance activation; restart and verify content, geometry, open state, checked state, assets, themes, and startup registration persist. Remaining M4 work is release packaging and resource validation.
 
 ---
 
