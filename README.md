@@ -8,20 +8,19 @@ Designed for students, developers, and anyone who wants quick references beside 
 
 ## Project status
 
-**Early development.** On `devin/dikit-v1-ios-notes`, M1 is implemented: editable sticky-note windows with text blocks, debounced autosave to local JSON, independent movable/resizable/minimizable note windows, close-as-hide, pin-to-top, window-state restoration with off-screen recovery, backups, and a launcher window. Compilation and runtime behavior still need verification on Windows (see [progress state](docs/PROGRESS_STATE.md)).
+**Early development.** On `devin/dikit-v1-ios-notes`, M1–M3 are implemented: editable sticky-note windows with typed content blocks (text, images, links, checklists), debounced autosave to local JSON, independent movable/resizable/minimizable note windows, close-as-hide, pin-to-top, window-state restoration with off-screen recovery, backups, a launcher window, and a Theme Studio with presets and per-note/global customization. Compilation and runtime behavior still need verification on Windows (see [progress state](docs/PROGRESS_STATE.md)).
 
-## Implemented (M1, branch)
+## Implemented (M1–M3, branch)
 
 - Create, edit, duplicate, and delete notes; deleting keeps a recoverable copy under `backups/deleted/`.
-- Text notes that autosave automatically; closing a note hides it without deleting it.
+- Typed content blocks per note: text, pasted or imported images stored under `notes/<id>/assets/`, `http`/`https`-only clickable links, and checklists with persistent checked state.
+- Paste (`Ctrl+V`) a screenshot to attach it, or a lone URL to create a link block; blocks are removable by right-click.
 - Independent note windows that restore position, size, open state, and pin status.
 - Local storage under `%LOCALAPPDATA%\Dikit` (per-note JSON, manifest, settings, backups).
-- Theme presets resolved per note (Classic Yellow, Lavender, Matcha, Sakura, Midnight); customization UI comes with M3.
+- Theme Studio: presets (Classic Yellow, Lavender, Matcha, Sakura, Midnight), background/text/accent colors, font, corner radius, opacity, live preview, per-note overrides, and global themes saved under `themes/`.
 
 ## Planned features
 
-- Mix pasted screenshots, clickable website links, and checklists in notes (models exist; UI lands in M2).
-- Customize colors, fonts, corners, and opacity per note with live preview (M3).
 - Manage notes from the system tray and opt in to launch at Windows sign-in (M4).
 
 See the [product requirements](docs/PRD/V1.0.md) for scope, acceptance criteria, and open decisions.
@@ -70,8 +69,8 @@ Use `dotnet run --no-build` only after a successful build. For setup checks and 
 | --- | --- | --- |
 | M0: Foundation | Development environment, WPF starter window, Git, and README | Complete |
 | M1: Notes and persistence | Editable notes, local JSON storage, autosave, and window restoration | Implemented on `devin/dikit-v1-ios-notes` (pending Windows verification) |
-| M2: Content blocks | Pasted images, safe website links, and checklists | Planned |
-| M3: Theme Studio | Presets, live preview, and per-note customization | Planned |
+| M2: Content blocks | Pasted images, safe website links, and checklists | Implemented on `devin/dikit-v1-ios-notes` (pending Windows verification) |
+| M3: Theme Studio | Presets, live preview, and per-note customization | Implemented on `devin/dikit-v1-ios-notes` (pending Windows verification) |
 | M4: Desktop integration and release | Tray controls, opt-in startup, recovery, and Windows distribution | Planned |
 
 ## Development
