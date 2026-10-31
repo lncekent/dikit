@@ -11,7 +11,7 @@
 | M1: Notes and persistence | Editable notes, local JSON storage, autosave, and window restoration | Implemented (pending Windows verification) |
 | M2: Content blocks | Pasted images, safe website links, and checklists | Implemented (pending Windows verification) |
 | M3: Theme Studio | Presets, live preview, and per-note customization | Implemented (pending Windows verification) |
-| M4: Desktop integration and release | Tray controls, opt-in startup, recovery, and Windows distribution | Planned |
+| M4: Desktop integration and release | Tray controls, opt-in startup, recovery, and Windows distribution | Integration implemented (pending Windows verification); packaging planned |
 
 ## Implemented on `devin/dikit-v1-ios-notes` (M1)
 
@@ -39,11 +39,22 @@
 - "Apply to all notes" reuses a matching preset or persists a `user-*` theme JSON under `themes/` and sets `globalThemeId`; "Save as preset" writes a reusable theme file without changing scope.
 - Custom theme fonts resolve with a `Segoe UI` fallback when the named family is unavailable.
 
+## Implemented on `devin/dikit-v1-ios-notes` (M4 — desktop integration)
+
+- `TrayIconService` hosts a system-tray icon (embedded `Resources/dikit.ico`, also the application icon) with a menu: New note, All notes, Hide all, Restore all, Settings, Quit. Left-click opens All notes. Uses the Windows Forms `NotifyIcon` via `UseWindowsForms` — no third-party packages.
+- `ShutdownMode="OnExplicitShutdown"` plus `MainWindow.OnClosing` → hide: closing the All notes window or any note never quits; only the tray/window Quit exits. `NotesManagerViewModel.IsShuttingDown` lets real shutdowns through.
+- `SingleInstanceGuard`: named mutex `Local\Dikit.SingleInstance`; a second launch signals `Local\Dikit.ShowRequest` and exits; the running instance shows/activates its All notes window. Fails open if the named objects cannot be created.
+- `StartupService`: opt-in `HKCU\Software\Microsoft\Windows\CurrentVersion\Run` value named `Dikit` (user-level, no admin, reversible). `SyncStartupOption` re-applies the stored preference at launch so a moved executable is re-registered.
+- All notes manager gained a search box filtering titles and text/link/caption block content via `NoteViewModel.MatchesSearch` over `NotesView`.
+- `SettingsWindow`: "launch at Windows sign-in" toggle, per-note backup retention (1–30), and data-folder display/open.
+- `ErrorLog`: appends timestamped errors to `logs/dikit.log`; `DispatcherUnhandledException` and note/settings save failures are logged without crashing the app.
+- `WindowGeometry` now verifies the restored title strip intersects an attached monitor's work area (per-monitor check via `Screen.AllScreens`, pixel→DIP scaled) and otherwise centers on the primary screen.
+
 ## Verification status
 
 - **Not yet verified:** `dotnet build` and runtime behavior — this branch was developed on Linux without a Windows/WPF-capable .NET SDK, so compilation and UX have not been exercised.
-- **To verify on Windows:** build and launch; create/edit/move/resize/minimize/close notes; restart and confirm content, geometry, open state, and topmost restore; corrupt a `note.json` and confirm backup recovery plus the launcher warning; paste a screenshot and confirm it reloads after restart; open an `https://` link and confirm a `javascript:`/`file:` URL cannot be opened; toggle checklists and confirm persistence; edit themes per-note and globally with live preview and confirm persistence across restart.
+- **To verify on Windows:** build and launch; create/edit/move/resize/minimize/close notes; restart and confirm content, geometry, open state, and topmost restore; corrupt a `note.json` and confirm backup recovery plus the All notes warning; paste a screenshot and confirm it reloads after restart; open an `https://` link and confirm a `javascript:`/`file:` URL cannot be opened; toggle checklists and confirm persistence; edit themes per-note and globally with live preview and confirm persistence across restart; confirm the tray menu items and that closing windows keeps Dikit in the tray; toggle launch-at-sign-in and confirm the `Run` value appears/disappears and notes restore after sign-in; launch a second instance and confirm the first instance's All notes window activates; detach a monitor and confirm notes are clamped back on-screen.
 
 ## Remaining for later milestones
 
-- Tray icon, opt-in launch at sign-in, single instance, release packaging (M4).
+- Windows release packaging/distribution and resource-usage validation (remaining M4 scope).
