@@ -10,6 +10,8 @@ public sealed class NotesManagerViewModel : ObservableObject
 {
     private readonly NoteStore _store;
     private readonly AppSettings _settings;
+    private readonly AssetService _assets;
+    private readonly ThemeService _themes;
     private readonly Dictionary<NoteViewModel, NoteWindow> _windows =
         new Dictionary<NoteViewModel, NoteWindow>();
     private int _cascadeOffset;
@@ -19,11 +21,16 @@ public sealed class NotesManagerViewModel : ObservableObject
         NoteStore store,
         IEnumerable<Note> notes,
         IEnumerable<string> loadWarnings,
-        AppSettings settings)
+        AppSettings settings,
+        AssetService assets,
+        ThemeService themes)
     {
         _store = store;
         _settings = settings;
+        _assets = assets;
+        _themes = themes;
         _store.BackupRetention = Math.Max(1, settings.BackupRetention);
+        _settings.PropertyChanged += OnSettingsPropertyChanged;
 
         foreach (string warning in loadWarnings)
         {
@@ -67,6 +74,10 @@ public sealed class NotesManagerViewModel : ObservableObject
     public ObservableCollection<string> LoadWarnings { get; } = new ObservableCollection<string>();
 
     public AppSettings Settings => _settings;
+
+    public ThemeService Themes => _themes;
+
+    public AssetService Assets => _assets;
 
     public RelayCommand NewNoteCommand { get; }
 
@@ -198,12 +209,48 @@ public sealed class NotesManagerViewModel : ObservableObject
         _store.SaveSettings(_settings);
     }
 
+    public void ApplyGlobalTheme(string themeId)
+    {
+        _settings.GlobalThemeId = themeId;
+        _store.SaveSettings(_settings);
+    }
+
+    public void OpenThemeStudio(NoteViewModel? note)
+    {
+        ThemeStudioViewModel studio = new ThemeStudioViewModel(note, this);
+        ThemeStudioWindow window = new ThemeStudioWindow { DataContext = studio };
+        if (note is not null && _windows.TryGetValue(note, out NoteWindow? host))
+        {
+            window.Owner = host;
+        }
+        else if (System.Windows.Application.Current.MainWindow is not null)
+        {
+            window.Owner = System.Windows.Application.Current.MainWindow;
+        }
+
+        window.Show();
+    }
+
+    private void OnSettingsPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName != nameof(AppSettings.GlobalThemeId))
+        {
+            return;
+        }
+
+        foreach (NoteViewModel vm in Notes)
+        {
+            vm.RefreshTheme();
+        }
+    }
+
     private NoteViewModel AddViewModel(Note note)
     {
-        NoteViewModel vm = new NoteViewModel(note, _store, _settings);
+        NoteViewModel vm = new NoteViewModel(note, _store, _settings, _assets, _themes);
         vm.HideRequested += HideNote;
         vm.DeleteRequested += DeleteNote;
         vm.DuplicateRequested += DuplicateNote;
+        vm.ThemeStudioRequested += OpenThemeStudio;
         Notes.Add(vm);
         return vm;
     }
