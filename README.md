@@ -14,7 +14,7 @@ Designed for students, developers, and anyone who wants quick references beside 
 
 - Create, edit, duplicate, and delete notes; deleting keeps a recoverable copy under `backups/deleted/`.
 - Typed content blocks per note: text, pasted or imported images stored under `notes/<id>/assets/`, `http`/`https`-only clickable links, and checklists with persistent checked state.
-- Paste (`Ctrl+V`) a screenshot to attach it, or a lone URL to create a link block; blocks are removable by right-click.
+- Paste (`Ctrl+V`) a screenshot to attach it, or a lone URL to create a link block; blocks are removable via a per-block remove button or right-click menu.
 - Independent note windows that restore position, size, open state, and pin status.
 - Local storage under `%LOCALAPPDATA%\Dikit` (per-note JSON, manifest, settings, backups).
 - Theme Studio: presets (Classic Yellow, Lavender, Matcha, Sakura, Midnight), background/text/accent colors, font, corner radius, opacity, live preview, per-note overrides, and global themes saved under `themes/`.
@@ -32,7 +32,7 @@ See the [product requirements](docs/PRD/V1.0.md) for scope, acceptance criteria,
 
 ## Installation and local setup
 
-The current way to try Dikit is to build it from source. These steps launch the starter window.
+The current way to try Dikit is to build it from source. On this branch, `dotnet run` launches the All notes manager plus a system-tray icon; notes open as independent desktop windows and the app stays in the tray until Quit.
 
 ### Requirements
 
@@ -50,6 +50,7 @@ Open PowerShell in the folder where you keep your projects:
 ```powershell
 git clone https://github.com/lncekent/dikit.git
 cd dikit
+git checkout devin/dikit-v1-ios-notes
 dotnet restore
 dotnet build
 dotnet run
@@ -80,7 +81,7 @@ Use `dotnet run --no-build` only after a successful build. For setup checks and 
 
 ## Development
 
-Dikit uses **C#, WPF/XAML, and .NET 10** with an MVVM structure: `Models/`, `ViewModels/`, `Views/`, `Services/` (persistence, tray, startup), and `Infrastructure/` (paths, atomic file writes, debouncing, MVVM helpers, single-instance guard). The tray uses the Windows Forms `NotifyIcon` from the shared Windows Desktop framework (`UseWindowsForms` in the project file); there are no third-party package dependencies.
+Dikit uses **C#, WPF/XAML, and .NET 10** with an MVVM structure: `Models/`, `ViewModels/`, `Views/`, `Services/` (persistence, tray, startup, window coordination), and `Infrastructure/` (paths, atomic file writes, debouncing, MVVM helpers, single-instance guard). The Inter typeface ships under `Resources/Fonts/` (SIL OFL) with a Segoe UI fallback, and the tray uses the Windows Forms `NotifyIcon` from the shared Windows Desktop framework (`UseWindowsForms` in the project file); there are no third-party package dependencies.
 
 Notes persist under `%LOCALAPPDATA%\Dikit` as per-note JSON (`notes/<id>/note.json`), a `manifest.json`, `app-settings.json`, rolling per-note backups, `backups/deleted`/`backups/quarantine` recovery folders, and a `logs/` error log. Accounts, cloud sync, collaboration, AI features, and telemetry are outside the MVP scope.
 
