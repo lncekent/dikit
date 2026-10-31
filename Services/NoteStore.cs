@@ -44,26 +44,34 @@ public sealed class NoteStore
             }
 
             string file = Path.Combine(directory, AppPaths.NoteFileName);
-            if (!File.Exists(file))
-            {
-                result.Warnings.Add($"Note '{id}' has no {AppPaths.NoteFileName}; it was skipped.");
-                continue;
-            }
-
-            Note? note = TryReadNote(file, id, result.Warnings);
+            bool hadFile = File.Exists(file);
+            Note? note = hadFile ? TryReadNote(file, id, result.Warnings) : null;
             if (note is null)
             {
                 note = RecoverFromBackups(id, result.Warnings);
                 if (note is not null)
                 {
+                    if (hadFile)
+                    {
+                        Quarantine(file);
+                    }
+
                     WriteNoteFile(note);
                     result.Warnings.Add($"Note '{id}' was recovered from a backup.");
                 }
                 else
                 {
-                    Quarantine(file);
-                    result.Warnings.Add(
-                        $"Note '{id}' could not be read; its data was moved to backups/quarantine.");
+                    if (hadFile)
+                    {
+                        Quarantine(file);
+                        result.Warnings.Add(
+                            $"Note '{id}' could not be read; its data was moved to backups/quarantine.");
+                    }
+                    else
+                    {
+                        result.Warnings.Add($"Note '{id}' has no {AppPaths.NoteFileName}; it was skipped.");
+                    }
+
                     continue;
                 }
             }

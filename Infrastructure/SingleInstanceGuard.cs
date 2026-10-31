@@ -26,7 +26,9 @@ public sealed class SingleInstanceGuard : IDisposable
             _mutex = null;
         }
 
-        IsPrimary = created;
+        // Fail open: a mutex creation error leaves created=false, which would
+        // make this instance exit as a supposed secondary — treat it as primary.
+        IsPrimary = created || _mutex is null;
         _ownsMutex = created;
         if (!IsPrimary)
         {

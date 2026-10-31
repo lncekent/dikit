@@ -153,16 +153,8 @@ public sealed class NoteViewModel : ObservableObject
 
     public void RemoveBlock(ContentBlock block)
     {
-        if (!_note.Blocks.Remove(block))
-        {
-            return;
-        }
-
-        if (block is ImageBlock image
-            && !_note.Blocks.OfType<ImageBlock>().Any(b => b.AssetId == image.AssetId))
-        {
-            _assets.DeleteAsset(_note.Id, image.AssetId);
-        }
+        // Assets are kept: retained note backups may still reference them.
+        _note.Blocks.Remove(block);
     }
 
     public void ApplyTheme(NoteTheme theme)
