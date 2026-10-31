@@ -1,0 +1,13 @@
+# Generated .NET build files
+bin/
+obj/
+
+# Local Visual Studio files
+.vs/
+*.user
+*.suo
+
+# VS Code logs
+.vscode/*.log
+
+AGENTS.md
