@@ -150,7 +150,7 @@
                                     CommandParameter="{Binding}"
                                     Background="{Binding Converter={StaticResource HexToBrush}}"
                                     ToolTip="{Binding}"
-                                    AutomationProperties.Name="{Binding, StringFormat='Color swatch {0}'}"/>
+                                    AutomationProperties.Name="{Binding Path=., StringFormat='Color swatch {0}'}"/>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
