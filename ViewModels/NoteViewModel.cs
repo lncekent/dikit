@@ -153,7 +153,6 @@ public sealed class NoteViewModel : ObservableObject
 
     public void RemoveBlock(ContentBlock block)
     {
-        // Assets are kept: retained note backups may still reference them.
         _note.Blocks.Remove(block);
     }
 

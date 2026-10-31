@@ -31,8 +31,8 @@ public partial class App : System.Windows.Application
         paths.EnsureDirectories();
         ErrorLog.Initialize(paths);
 
-        NoteStore store = new NoteStore(paths);
         AssetService assets = new AssetService(paths);
+        NoteStore store = new NoteStore(paths, assets);
         ThemeService themes = new ThemeService(paths);
         StartupService startup = new StartupService();
         StoreLoadResult loaded = store.LoadAll();

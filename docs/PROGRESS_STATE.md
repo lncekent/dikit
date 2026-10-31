@@ -28,7 +28,7 @@
 
 - Per-note block toolbar (`+ Text`, `+ Checklist`, `+ Link`, `+ Image`) appends typed blocks; every block can be removed via a focusable per-block remove button or its right-click "Remove block" menu.
 - `Ctrl+V` inside a note saves a clipboard bitmap as a PNG under `notes/<id>/assets/` (downscaled past 2048 px on the longest edge, capped at 15 MB) and appends an image block; pasting a lone `http`/`https` URL outside a text field creates a link block.
-- `+ Image` imports a `.png/.jpg/.jpeg/.gif/.bmp` file into the note's assets folder. Image blocks render the stored asset offline (decoded at bounded width) with an editable caption and an "Image unavailable" fallback; removing an image block retains its asset so retained JSON backups can still resolve it. Duplicating a note copies its assets.
+- `+ Image` imports a `.png/.jpg/.jpeg/.gif/.bmp` file into the note's assets folder. Image blocks render the stored asset offline (decoded at bounded width) with an editable caption and an "Image unavailable" fallback; removing an image block retains its asset while retained JSON backups still reference it, then prunes it safely. Duplicating a note copies only referenced assets.
 - Link blocks expose editable label and URL fields plus an "Open ↗" action that is enabled only for `http`/`https` URIs and launches the default browser via `LinkLauncher`; other schemes are never executed.
 - Checklist blocks persist `checked` state and render completed items struck through.
 
