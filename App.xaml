@@ -1,7 +1,8 @@
 <Application x:Class="dikit.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:infra="clr-namespace:dikit.Infrastructure">
+             xmlns:infra="clr-namespace:dikit.Infrastructure"
+             ShutdownMode="OnExplicitShutdown">
     <Application.Resources>
 
         <infra:HexToBrushConverter x:Key="HexToBrush"/>

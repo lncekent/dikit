@@ -15,15 +15,16 @@ public sealed class HexToBrushConverter : IValueConverter
         {
             try
             {
-                Color color = (Color)ColorConverter.ConvertFromString(text);
-                return new SolidColorBrush(color);
+                System.Windows.Media.Color color = (System.Windows.Media.Color)
+                    System.Windows.Media.ColorConverter.ConvertFromString(text);
+                return new System.Windows.Media.SolidColorBrush(color);
             }
             catch (FormatException)
             {
             }
         }
 
-        return Brushes.Transparent;
+        return System.Windows.Media.Brushes.Transparent;
     }
 
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
@@ -92,15 +93,16 @@ public sealed class FontFamilyStringConverter : IValueConverter
     {
         if (value is string name && !string.IsNullOrWhiteSpace(name))
         {
-            return new FontFamily(name + ", Segoe UI");
+            return new System.Windows.Media.FontFamily(name + ", Segoe UI");
         }
 
-        return new FontFamily("Inter, Segoe UI");
+        return new System.Windows.Media.FontFamily("Inter, Segoe UI");
     }
 
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
     {
-        if (value is FontFamily family && !string.IsNullOrWhiteSpace(family.Source))
+        if (value is System.Windows.Media.FontFamily family
+            && !string.IsNullOrWhiteSpace(family.Source))
         {
             return family.Source;
         }

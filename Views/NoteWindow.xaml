@@ -11,6 +11,7 @@
         MinHeight="220"
         Topmost="{Binding IsTopMost, Mode=TwoWay}"
         Opacity="{Binding Theme.Opacity}"
+        Icon="pack://application:,,,/Resources/dikit.ico"
         FontFamily="{Binding Theme.FontFamily, Converter={StaticResource FontFamilyString}}">
 
     <Border Margin="10"
