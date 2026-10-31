@@ -145,17 +145,6 @@ public partial class NoteWindow : Window
         }
     }
 
-    private void RemoveBlockMenuItem_Click(object sender, RoutedEventArgs e)
-    {
-        if ((sender as System.Windows.Controls.MenuItem)?.Parent
-                is System.Windows.Controls.ContextMenu menu
-            && menu.PlacementTarget is FrameworkElement target
-            && target.DataContext is ContentBlock block)
-        {
-            _viewModel.RemoveBlock(block);
-        }
-    }
-
     private void DeleteMenuItem_Click(object sender, RoutedEventArgs e)
     {
         System.Windows.MessageBoxResult result = System.Windows.MessageBox.Show(
