@@ -1,4 +1,6 @@
 using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Windows.Data;
 using dikit.Infrastructure;
 using dikit.Models;
 using dikit.Services;
@@ -12,10 +14,14 @@ public sealed class NotesManagerViewModel : ObservableObject
     private readonly AppSettings _settings;
     private readonly AssetService _assets;
     private readonly ThemeService _themes;
+    private readonly AppPaths _paths;
+    private readonly StartupService _startup;
     private readonly Dictionary<NoteViewModel, NoteWindow> _windows =
         new Dictionary<NoteViewModel, NoteWindow>();
+    private SettingsWindow? _settingsWindow;
     private int _cascadeOffset;
     private bool _shuttingDown;
+    private string _searchText = string.Empty;
 
     public NotesManagerViewModel(
         NoteStore store,
@@ -23,14 +29,22 @@ public sealed class NotesManagerViewModel : ObservableObject
         IEnumerable<string> loadWarnings,
         AppSettings settings,
         AssetService assets,
-        ThemeService themes)
+        ThemeService themes,
+        AppPaths paths,
+        StartupService startup)
     {
         _store = store;
         _settings = settings;
         _assets = assets;
         _themes = themes;
+        _paths = paths;
+        _startup = startup;
         _store.BackupRetention = Math.Max(1, settings.BackupRetention);
         _settings.PropertyChanged += OnSettingsPropertyChanged;
+
+        NotesView = CollectionViewSource.GetDefaultView(Notes);
+        NotesView.Filter = item =>
+            item is NoteViewModel vm && vm.MatchesSearch(_searchText);
 
         foreach (string warning in loadWarnings)
         {
@@ -66,14 +80,68 @@ public sealed class NotesManagerViewModel : ObservableObject
         });
         HideAllCommand = new RelayCommand(HideAll);
         RestoreAllCommand = new RelayCommand(RestoreAll);
+        OpenSettingsCommand = new RelayCommand(OpenSettings);
         QuitCommand = new RelayCommand(Quit);
     }
 
     public ObservableCollection<NoteViewModel> Notes { get; } = new ObservableCollection<NoteViewModel>();
 
+    public ICollectionView NotesView { get; }
+
     public ObservableCollection<string> LoadWarnings { get; } = new ObservableCollection<string>();
 
     public AppSettings Settings => _settings;
+
+    public string DataFolderPath => _paths.Root;
+
+    public bool IsShuttingDown => _shuttingDown;
+
+    public string SearchText
+    {
+        get => _searchText;
+        set
+        {
+            if (SetProperty(ref _searchText, value))
+            {
+                NotesView.Refresh();
+            }
+        }
+    }
+
+    public bool LaunchAtSignIn
+    {
+        get => _settings.LaunchAtSignIn;
+        set
+        {
+            if (_settings.LaunchAtSignIn == value)
+            {
+                return;
+            }
+
+            _settings.LaunchAtSignIn = value;
+            _startup.SetEnabled(value);
+            _store.SaveSettings(_settings);
+            OnPropertyChanged();
+        }
+    }
+
+    public int BackupRetention
+    {
+        get => _settings.BackupRetention;
+        set
+        {
+            int clamped = Math.Clamp(value, 1, 30);
+            if (_settings.BackupRetention == clamped)
+            {
+                return;
+            }
+
+            _settings.BackupRetention = clamped;
+            _store.BackupRetention = clamped;
+            _store.SaveSettings(_settings);
+            OnPropertyChanged();
+        }
+    }
 
     public ThemeService Themes => _themes;
 
@@ -90,6 +158,8 @@ public sealed class NotesManagerViewModel : ObservableObject
     public RelayCommand HideAllCommand { get; }
 
     public RelayCommand RestoreAllCommand { get; }
+
+    public RelayCommand OpenSettingsCommand { get; }
 
     public RelayCommand QuitCommand { get; }
 
@@ -206,13 +276,43 @@ public sealed class NotesManagerViewModel : ObservableObject
             vm.SaveNow();
         }
 
-        _store.SaveSettings(_settings);
+        try
+        {
+            _store.SaveSettings(_settings);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            ErrorLog.Log($"Settings could not be saved on shutdown: {ex.Message}");
+        }
     }
 
     public void ApplyGlobalTheme(string themeId)
     {
         _settings.GlobalThemeId = themeId;
         _store.SaveSettings(_settings);
+    }
+
+    public void SyncStartupOption()
+    {
+        _startup.SetEnabled(_settings.LaunchAtSignIn);
+    }
+
+    public void OpenSettings()
+    {
+        if (_settingsWindow is not null)
+        {
+            _settingsWindow.Activate();
+            return;
+        }
+
+        _settingsWindow = new SettingsWindow { DataContext = this };
+        if (System.Windows.Application.Current.MainWindow is { } owner && owner.IsVisible)
+        {
+            _settingsWindow.Owner = owner;
+        }
+
+        _settingsWindow.Closed += (_, _) => _settingsWindow = null;
+        _settingsWindow.Show();
     }
 
     public void OpenThemeStudio(NoteViewModel? note)

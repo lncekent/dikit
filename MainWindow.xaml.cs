@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Windows;
 using dikit.ViewModels;
 
@@ -8,6 +9,18 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
+    }
+
+    protected override void OnClosing(CancelEventArgs e)
+    {
+        if (DataContext is NotesManagerViewModel manager && !manager.IsShuttingDown)
+        {
+            e.Cancel = true;
+            Hide();
+            return;
+        }
+
+        base.OnClosing(e);
     }
 
     private void ThemeStudio_Click(object sender, RoutedEventArgs e)
@@ -25,13 +38,13 @@ public partial class MainWindow : Window
             return;
         }
 
-        MessageBoxResult result = MessageBox.Show(
+        System.Windows.MessageBoxResult result = System.Windows.MessageBox.Show(
             this,
             $"Delete \"{note.Title}\"? A recoverable copy is kept under backups/deleted.",
             "Delete note",
-            MessageBoxButton.YesNo,
-            MessageBoxImage.Question);
-        if (result == MessageBoxResult.Yes && DataContext is NotesManagerViewModel manager)
+            System.Windows.MessageBoxButton.YesNo,
+            System.Windows.MessageBoxImage.Question);
+        if (result == System.Windows.MessageBoxResult.Yes && DataContext is NotesManagerViewModel manager)
         {
             manager.DeleteNote(note);
         }

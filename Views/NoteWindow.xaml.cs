@@ -1,12 +1,10 @@
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
 using dikit.Infrastructure;
 using dikit.Models;
 using dikit.Services;
 using dikit.ViewModels;
-using Microsoft.Win32;
 
 namespace dikit.Views;
 
@@ -42,22 +40,23 @@ public partial class NoteWindow : Window
         SyncPlacement();
     }
 
-    protected override void OnPreviewKeyDown(KeyEventArgs e)
+    protected override void OnPreviewKeyDown(System.Windows.Input.KeyEventArgs e)
     {
         try
         {
             if (e.Key == Key.V && Keyboard.Modifiers == ModifierKeys.Control)
             {
-                if (Clipboard.ContainsImage())
+                if (System.Windows.Clipboard.ContainsImage())
                 {
                     PasteClipboardImage();
                     e.Handled = true;
                     return;
                 }
 
-                if (Keyboard.FocusedElement is not TextBox && Clipboard.ContainsText())
+                if (Keyboard.FocusedElement is not System.Windows.Controls.TextBox
+                    && System.Windows.Clipboard.ContainsText())
                 {
-                    string text = Clipboard.GetText().Trim();
+                    string text = System.Windows.Clipboard.GetText().Trim();
                     if (LinkLauncher.IsValidHttpUri(text))
                     {
                         _viewModel.AddLinkFromUrl(text);
@@ -86,7 +85,7 @@ public partial class NoteWindow : Window
 
     private void PasteClipboardImage()
     {
-        BitmapSource? image = Clipboard.GetImage();
+        BitmapSource? image = System.Windows.Clipboard.GetImage();
         if (image is null)
         {
             return;
@@ -94,12 +93,12 @@ public partial class NoteWindow : Window
 
         if (!_viewModel.AddImageFromBitmap(image))
         {
-            MessageBox.Show(
+            System.Windows.MessageBox.Show(
                 this,
                 "The image could not be saved into this note's assets.",
                 "Paste image",
-                MessageBoxButton.OK,
-                MessageBoxImage.Warning);
+                System.Windows.MessageBoxButton.OK,
+                System.Windows.MessageBoxImage.Warning);
         }
     }
 
@@ -118,7 +117,7 @@ public partial class NoteWindow : Window
 
     private void AddImage_Click(object sender, RoutedEventArgs e)
     {
-        OpenFileDialog dialog = new OpenFileDialog
+        Microsoft.Win32.OpenFileDialog dialog = new Microsoft.Win32.OpenFileDialog
         {
             Title = "Add image to note",
             Filter = "Images|*.png;*.jpg;*.jpeg;*.gif;*.bmp|All files|*.*",
@@ -128,12 +127,12 @@ public partial class NoteWindow : Window
 
         if (dialog.ShowDialog(this) == true && !_viewModel.AddImageFromFile(dialog.FileName))
         {
-            MessageBox.Show(
+            System.Windows.MessageBox.Show(
                 this,
                 "That file could not be added as an image asset.",
                 "Add image",
-                MessageBoxButton.OK,
-                MessageBoxImage.Warning);
+                System.Windows.MessageBoxButton.OK,
+                System.Windows.MessageBoxImage.Warning);
         }
     }
 
@@ -148,7 +147,8 @@ public partial class NoteWindow : Window
 
     private void RemoveBlockMenuItem_Click(object sender, RoutedEventArgs e)
     {
-        if ((sender as MenuItem)?.Parent is ContextMenu menu
+        if ((sender as System.Windows.Controls.MenuItem)?.Parent
+                is System.Windows.Controls.ContextMenu menu
             && menu.PlacementTarget is FrameworkElement target
             && target.DataContext is ContentBlock block)
         {
@@ -158,13 +158,13 @@ public partial class NoteWindow : Window
 
     private void DeleteMenuItem_Click(object sender, RoutedEventArgs e)
     {
-        MessageBoxResult result = MessageBox.Show(
+        System.Windows.MessageBoxResult result = System.Windows.MessageBox.Show(
             this,
             "Delete this note? A recoverable copy is kept under backups/deleted.",
             "Delete note",
-            MessageBoxButton.YesNo,
-            MessageBoxImage.Question);
-        if (result == MessageBoxResult.Yes)
+            System.Windows.MessageBoxButton.YesNo,
+            System.Windows.MessageBoxImage.Question);
+        if (result == System.Windows.MessageBoxResult.Yes)
         {
             _viewModel.DeleteCommand.Execute(null);
         }

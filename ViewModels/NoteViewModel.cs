@@ -181,8 +181,50 @@ public sealed class NoteViewModel : ObservableObject
     public void SaveNow()
     {
         _saver.Cancel();
-        _store.SaveNote(_note);
+        try
+        {
+            _store.SaveNote(_note);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            ErrorLog.Log($"Note '{_note.Id}' could not be saved: {ex.Message}");
+        }
+
         OnPropertyChanged(nameof(UpdatedText));
+    }
+
+    public bool MatchesSearch(string? query)
+    {
+        if (string.IsNullOrWhiteSpace(query))
+        {
+            return true;
+        }
+
+        string needle = query.Trim();
+        if (_note.Title.Contains(needle, StringComparison.OrdinalIgnoreCase))
+        {
+            return true;
+        }
+
+        foreach (ContentBlock block in _note.Blocks)
+        {
+            switch (block)
+            {
+                case TextBlock text when Contains(text.Text, needle):
+                case ChecklistBlock checklist when Contains(checklist.Text, needle):
+                case ImageBlock image when Contains(image.Alt, needle):
+                    return true;
+                case LinkBlock link when Contains(link.Text, needle) || Contains(link.Url, needle):
+                    return true;
+            }
+        }
+
+        return false;
+
+        static bool Contains(string? haystack, string needle)
+        {
+            return haystack?.Contains(needle, StringComparison.OrdinalIgnoreCase) ?? false;
+        }
     }
 
     private void Touch()
