@@ -65,6 +65,8 @@ public sealed class NoteViewModel : ObservableObject
         }
     }
 
+    public event Action<NoteViewModel>? SearchableContentChanged;
+
     public event Action<NoteViewModel>? HideRequested;
 
     public event Action<NoteViewModel>? DeleteRequested;
@@ -178,6 +180,11 @@ public sealed class NoteViewModel : ObservableObject
         OnPropertyChanged(nameof(Theme));
     }
 
+    public void CancelPendingSave()
+    {
+        _saver.Cancel();
+    }
+
     public void SaveNow()
     {
         _saver.Cancel();
@@ -252,7 +259,11 @@ public sealed class NoteViewModel : ObservableObject
 
     private void OnModelPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (sender is WindowPlacement)
+        if (sender is ContentBlock)
+        {
+            SearchableContentChanged?.Invoke(this);
+        }
+        else if (sender is WindowPlacement)
         {
             if (e.PropertyName == nameof(WindowPlacement.AlwaysOnTop))
             {
@@ -274,6 +285,7 @@ public sealed class NoteViewModel : ObservableObject
             if (e.PropertyName == nameof(Note.Title))
             {
                 OnPropertyChanged(nameof(Title));
+                SearchableContentChanged?.Invoke(this);
             }
             else if (e.PropertyName == nameof(Note.ThemeId)
                 || e.PropertyName == nameof(Note.ThemeOverride))
@@ -316,6 +328,7 @@ public sealed class NoteViewModel : ObservableObject
             }
         }
 
+        SearchableContentChanged?.Invoke(this);
         Touch();
     }
 }

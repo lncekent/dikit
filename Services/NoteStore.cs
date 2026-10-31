@@ -120,15 +120,41 @@ public sealed class NoteStore
 
     public Note CreateNote()
     {
+        Note note = NewNote("New note");
+        SaveNote(note);
+        return note;
+    }
+
+    public Note CreateWelcomeNote()
+    {
+        Note note = NewNote("Welcome to Dikit");
+        note.Blocks.Add(new TextBlock
+        {
+            Text = "Dikit keeps small notes on your desktop — text, images, links, and checklists, all saved automatically to this device.",
+        });
+        note.Blocks.Add(new TextBlock
+        {
+            Text = "Drag the title area to move a note, drag its edges to resize, and use + Text / + Checklist / + Link / + Image below to add blocks. Ctrl+V pastes a screenshot or a link.",
+        });
+        note.Blocks.Add(new ChecklistBlock { Text = "Try pinning this note or restyling it with the Theme button" });
+        note.Blocks.Add(new TextBlock
+        {
+            Text = "Every note lives under All notes in the main window or the Dikit tray icon. Settings offers the launch-at-sign-in option, and Quit lives in the tray menu — closing a note never deletes it.",
+        });
+        SaveNote(note);
+        return note;
+    }
+
+    private static Note NewNote(string title)
+    {
         Note note = new Note
         {
             Id = NewNoteId(),
-            Title = "New note",
+            Title = title,
             CreatedUtc = DateTimeOffset.UtcNow,
             UpdatedUtc = DateTimeOffset.UtcNow,
         };
         note.Blocks.Add(new TextBlock());
-        SaveNote(note);
         return note;
     }
 
@@ -150,8 +176,17 @@ public sealed class NoteStore
             copy.Window.Y = y + 28;
         }
 
+        try
+        {
+            CopyAssets(source.Id, copy.Id);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            TryDeleteDirectory(_paths.NoteDirectory(copy.Id));
+            throw;
+        }
+
         SaveNote(copy);
-        CopyAssets(source.Id, copy.Id);
         return copy;
     }
 
@@ -163,13 +198,21 @@ public sealed class NoteStore
             return;
         }
 
+        string target = _paths.NoteAssetsDirectory(targetId);
+        Directory.CreateDirectory(target);
+        foreach (string file in Directory.EnumerateFiles(source))
+        {
+            File.Copy(file, Path.Combine(target, Path.GetFileName(file)), overwrite: false);
+        }
+    }
+
+    private static void TryDeleteDirectory(string directory)
+    {
         try
         {
-            string target = _paths.NoteAssetsDirectory(targetId);
-            Directory.CreateDirectory(target);
-            foreach (string file in Directory.EnumerateFiles(source))
+            if (Directory.Exists(directory))
             {
-                File.Copy(file, Path.Combine(target, Path.GetFileName(file)), overwrite: false);
+                Directory.Delete(directory, recursive: true);
             }
         }
         catch (IOException)
@@ -277,6 +320,14 @@ public sealed class NoteStore
                     File.ReadAllText(backup), JsonOptions.Default);
                 if (note is not null)
                 {
+                    if (note.SchemaVersion != Note.CurrentSchemaVersion)
+                    {
+                        warnings.Add(
+                            $"Backup '{Path.GetFileName(backup)}' for note '{id}' uses schema version "
+                            + $"{note.SchemaVersion}, which this build does not support; it was not restored.");
+                        continue;
+                    }
+
                     note.Id = id;
                     return note;
                 }

@@ -38,7 +38,7 @@ public partial class App : System.Windows.Application
         StoreLoadResult loaded = store.LoadAll();
         _manager = new NotesManagerViewModel(
             store, loaded.Notes, loaded.Warnings, loaded.Settings, assets, themes,
-            paths, startup);
+            paths, startup, new WindowCoordinator());
         _manager.SyncStartupOption();
 
         MainWindow launcher = new MainWindow { DataContext = _manager };
@@ -84,7 +84,7 @@ public partial class App : System.Windows.Application
         e.Handled = true;
     }
 
-    protected override void OnSessionEnding(SessionEndingEventArgs e)
+    protected override void OnSessionEnding(SessionEndingCancelEventArgs e)
     {
         _manager?.Shutdown();
         base.OnSessionEnding(e);

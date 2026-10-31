@@ -4,7 +4,6 @@ using System.Windows.Data;
 using dikit.Infrastructure;
 using dikit.Models;
 using dikit.Services;
-using dikit.Views;
 
 namespace dikit.ViewModels;
 
@@ -16,10 +15,7 @@ public sealed class NotesManagerViewModel : ObservableObject
     private readonly ThemeService _themes;
     private readonly AppPaths _paths;
     private readonly StartupService _startup;
-    private readonly Dictionary<NoteViewModel, NoteWindow> _windows =
-        new Dictionary<NoteViewModel, NoteWindow>();
-    private SettingsWindow? _settingsWindow;
-    private int _cascadeOffset;
+    private readonly WindowCoordinator _windows;
     private bool _shuttingDown;
     private string _searchText = string.Empty;
 
@@ -31,7 +27,8 @@ public sealed class NotesManagerViewModel : ObservableObject
         AssetService assets,
         ThemeService themes,
         AppPaths paths,
-        StartupService startup)
+        StartupService startup,
+        WindowCoordinator windows)
     {
         _store = store;
         _settings = settings;
@@ -39,6 +36,8 @@ public sealed class NotesManagerViewModel : ObservableObject
         _themes = themes;
         _paths = paths;
         _startup = startup;
+        _windows = windows;
+        _windows.NoteWindowClosed += OnNoteWindowClosed;
         _store.BackupRetention = Math.Max(1, settings.BackupRetention);
         _settings.PropertyChanged += OnSettingsPropertyChanged;
 
@@ -172,35 +171,19 @@ public sealed class NotesManagerViewModel : ObservableObject
 
         if (Notes.Count == 0)
         {
-            NewNote();
+            CreateAndOpen(_store.CreateWelcomeNote());
         }
     }
 
     public void NewNote()
     {
-        NoteViewModel vm = AddViewModel(_store.CreateNote());
-        PositionNew(vm);
-        OpenNote(vm);
+        CreateAndOpen(_store.CreateNote());
     }
 
     public void OpenNote(NoteViewModel vm)
     {
-        if (_windows.TryGetValue(vm, out NoteWindow? existing))
-        {
-            if (existing.WindowState == System.Windows.WindowState.Minimized)
-            {
-                existing.WindowState = System.Windows.WindowState.Normal;
-            }
-
-            existing.Activate();
-            return;
-        }
-
         vm.Model.Window.IsOpen = true;
-        NoteWindow window = new NoteWindow(vm);
-        _windows[vm] = window;
-        window.Closed += OnWindowClosed;
-        window.Show();
+        _windows.ShowNote(vm);
         vm.SaveNow();
     }
 
@@ -208,27 +191,30 @@ public sealed class NotesManagerViewModel : ObservableObject
     {
         vm.Model.Window.IsOpen = false;
         vm.SaveNow();
-        if (_windows.Remove(vm, out NoteWindow? window))
-        {
-            window.Close();
-        }
+        _windows.CloseNote(vm);
     }
 
     public void DuplicateNote(NoteViewModel vm)
     {
-        Note copy = _store.DuplicateNote(vm.Model);
-        NoteViewModel copyVm = AddViewModel(copy);
-        OpenNote(copyVm);
+        Note copy;
+        try
+        {
+            copy = _store.DuplicateNote(vm.Model);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            ErrorLog.Log($"Note '{vm.Id}' could not be duplicated: {ex.Message}");
+            LoadWarnings.Add($"'{vm.Title}' could not be duplicated; its images could not be copied.");
+            return;
+        }
+
+        CreateAndOpen(copy);
     }
 
     public void DeleteNote(NoteViewModel vm)
     {
-        if (_windows.Remove(vm, out NoteWindow? window))
-        {
-            window.Closed -= OnWindowClosed;
-            window.Close();
-        }
-
+        vm.CancelPendingSave();
+        _windows.CloseNote(vm);
         _store.DeleteNote(vm.Id);
         Notes.Remove(vm);
     }
@@ -241,12 +227,7 @@ public sealed class NotesManagerViewModel : ObservableObject
             vm.SaveNow();
         }
 
-        foreach (NoteWindow window in _windows.Values.ToList())
-        {
-            window.Close();
-        }
-
-        _windows.Clear();
+        _windows.CloseAllNotes();
     }
 
     public void RestoreAll()
@@ -299,36 +280,12 @@ public sealed class NotesManagerViewModel : ObservableObject
 
     public void OpenSettings()
     {
-        if (_settingsWindow is not null)
-        {
-            _settingsWindow.Activate();
-            return;
-        }
-
-        _settingsWindow = new SettingsWindow { DataContext = this };
-        if (System.Windows.Application.Current.MainWindow is { } owner && owner.IsVisible)
-        {
-            _settingsWindow.Owner = owner;
-        }
-
-        _settingsWindow.Closed += (_, _) => _settingsWindow = null;
-        _settingsWindow.Show();
+        _windows.ShowSettings(this);
     }
 
     public void OpenThemeStudio(NoteViewModel? note)
     {
-        ThemeStudioViewModel studio = new ThemeStudioViewModel(note, this);
-        ThemeStudioWindow window = new ThemeStudioWindow { DataContext = studio };
-        if (note is not null && _windows.TryGetValue(note, out NoteWindow? host))
-        {
-            window.Owner = host;
-        }
-        else if (System.Windows.Application.Current.MainWindow is not null)
-        {
-            window.Owner = System.Windows.Application.Current.MainWindow;
-        }
-
-        window.Show();
+        _windows.ShowThemeStudio(new ThemeStudioViewModel(note, this), note);
     }
 
     private void OnSettingsPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -344,6 +301,13 @@ public sealed class NotesManagerViewModel : ObservableObject
         }
     }
 
+    private void CreateAndOpen(Note note)
+    {
+        NoteViewModel vm = AddViewModel(note);
+        _windows.PositionNewNote(vm, _settings);
+        OpenNote(vm);
+    }
+
     private NoteViewModel AddViewModel(Note note)
     {
         NoteViewModel vm = new NoteViewModel(note, _store, _settings, _assets, _themes);
@@ -351,36 +315,25 @@ public sealed class NotesManagerViewModel : ObservableObject
         vm.DeleteRequested += DeleteNote;
         vm.DuplicateRequested += DuplicateNote;
         vm.ThemeStudioRequested += OpenThemeStudio;
+        vm.SearchableContentChanged += OnSearchableContentChanged;
         Notes.Add(vm);
         return vm;
     }
 
-    private void OnWindowClosed(object? sender, EventArgs e)
+    private void OnSearchableContentChanged(NoteViewModel vm)
     {
-        if (sender is NoteWindow { DataContext: NoteViewModel vm })
+        if (_searchText.Length > 0)
         {
-            OnNoteWindowClosed(vm);
+            NotesView.Refresh();
         }
     }
 
     private void OnNoteWindowClosed(NoteViewModel vm)
     {
-        _windows.Remove(vm);
         if (!_shuttingDown && vm.Model.Window.IsOpen)
         {
             vm.Model.Window.IsOpen = false;
             vm.SaveNow();
         }
-    }
-
-    private void PositionNew(NoteViewModel vm)
-    {
-        System.Windows.Rect workArea = System.Windows.SystemParameters.WorkArea;
-        int step = (_cascadeOffset % 8) * 28;
-        vm.Model.Window.X = workArea.Left + 140 + step;
-        vm.Model.Window.Y = workArea.Top + 120 + step;
-        vm.Model.Window.Width = _settings.DefaultNoteWidth;
-        vm.Model.Window.Height = _settings.DefaultNoteHeight;
-        _cascadeOffset++;
     }
 }
