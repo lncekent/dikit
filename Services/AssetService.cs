@@ -99,6 +99,48 @@ public sealed class AssetService
         return File.Exists(fullPath) ? fullPath : null;
     }
 
+    public void DeleteUnreferencedAssets(string noteId, IReadOnlySet<string> referencedAssetIds)
+    {
+        try
+        {
+            DirectoryInfo noteDirectory = new DirectoryInfo(_paths.NoteDirectory(noteId));
+            DirectoryInfo assetsDirectory = new DirectoryInfo(_paths.NoteAssetsDirectory(noteId));
+            if (!IsPlainDirectory(noteDirectory) || !IsPlainDirectory(assetsDirectory))
+            {
+                return;
+            }
+
+            foreach (FileInfo file in assetsDirectory.EnumerateFiles())
+            {
+                if (IsReparsePoint(file)
+                    || referencedAssetIds.Contains("assets/" + file.Name))
+                {
+                    continue;
+                }
+
+                file.Delete();
+            }
+        }
+        catch (IOException)
+        {
+        }
+        catch (UnauthorizedAccessException)
+        {
+        }
+    }
+
+    private static bool IsPlainDirectory(DirectoryInfo directory)
+    {
+        return directory.Exists && directory.LinkTarget is null
+            && !directory.Attributes.HasFlag(FileAttributes.ReparsePoint);
+    }
+
+    private static bool IsReparsePoint(FileInfo file)
+    {
+        return file.LinkTarget is not null
+            || file.Attributes.HasFlag(FileAttributes.ReparsePoint);
+    }
+
     private static BitmapSource Downscale(BitmapSource bitmap)
     {
         int width = bitmap.PixelWidth;

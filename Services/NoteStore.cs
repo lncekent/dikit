@@ -18,11 +18,13 @@ public sealed class NoteStore
 {
     private static readonly Regex SafeNoteId = new Regex("^[a-zA-Z0-9_-]+$", RegexOptions.Compiled);
     private readonly AppPaths _paths;
+    private readonly AssetService _assets;
     private NoteManifest _manifest = new NoteManifest();
 
-    public NoteStore(AppPaths paths)
+    public NoteStore(AppPaths paths, AssetService assets)
     {
         _paths = paths;
+        _assets = assets;
     }
 
     public int BackupRetention { get; set; } = 5;
@@ -186,7 +188,7 @@ public sealed class NoteStore
 
         try
         {
-            CopyAssets(source.Id, copy.Id);
+            CopyAssets(source.Id, copy);
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
         {
@@ -198,7 +200,7 @@ public sealed class NoteStore
         return copy;
     }
 
-    private void CopyAssets(string sourceId, string targetId)
+    private void CopyAssets(string sourceId, Note targetNote)
     {
         string source = _paths.NoteAssetsDirectory(sourceId);
         if (!Directory.Exists(source))
@@ -206,11 +208,18 @@ public sealed class NoteStore
             return;
         }
 
-        string target = _paths.NoteAssetsDirectory(targetId);
+        string target = _paths.NoteAssetsDirectory(targetNote.Id);
         Directory.CreateDirectory(target);
-        foreach (string file in Directory.EnumerateFiles(source))
+        foreach (string fileName in targetNote.Blocks.OfType<ImageBlock>()
+                     .Select(block => Path.GetFileName(block.AssetId))
+                     .Where(name => !string.IsNullOrEmpty(name))
+                     .Distinct(StringComparer.OrdinalIgnoreCase))
         {
-            File.Copy(file, Path.Combine(target, Path.GetFileName(file)), overwrite: false);
+            string file = Path.Combine(source, fileName!);
+            if (File.Exists(file))
+            {
+                File.Copy(file, Path.Combine(target, fileName!), overwrite: false);
+            }
         }
     }
 
@@ -236,6 +245,7 @@ public sealed class NoteStore
         note.SchemaVersion = Note.CurrentSchemaVersion;
         note.UpdatedUtc = DateTimeOffset.UtcNow;
         WriteNoteFile(note);
+        _assets.DeleteUnreferencedAssets(note.Id, CollectReferencedAssetIds(note));
         UpsertManifestEntry(note);
         WriteManifest();
     }
@@ -269,6 +279,48 @@ public sealed class NoteStore
 
         Directory.CreateDirectory(Path.GetDirectoryName(file)!);
         AtomicFileWriter.WriteAllText(file, JsonSerializer.Serialize(note, JsonOptions.Default));
+    }
+
+    private HashSet<string> CollectReferencedAssetIds(Note note)
+    {
+        HashSet<string> referenced = ImageAssetIds(note).ToHashSet(StringComparer.OrdinalIgnoreCase);
+        string backupDir = _paths.NoteBackupsDirectory(note.Id);
+        try
+        {
+            if (!Directory.Exists(backupDir))
+            {
+                return referenced;
+            }
+
+            foreach (string backup in Directory.EnumerateFiles(backupDir, "*.json"))
+            {
+                try
+                {
+                    Note? backupNote = JsonSerializer.Deserialize<Note>(
+                        File.ReadAllText(backup), JsonOptions.Default);
+                    if (backupNote?.SchemaVersion == Note.CurrentSchemaVersion)
+                    {
+                        referenced.UnionWith(ImageAssetIds(backupNote));
+                    }
+                }
+                catch (Exception ex) when (ex is IOException or JsonException
+                    or NotSupportedException or UnauthorizedAccessException)
+                {
+                }
+            }
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+        }
+
+        return referenced;
+    }
+
+    private static IEnumerable<string> ImageAssetIds(Note note)
+    {
+        return note.Blocks.OfType<ImageBlock>()
+            .Select(block => block.AssetId)
+            .Where(assetId => !string.IsNullOrEmpty(assetId));
     }
 
     private void BackupExisting(string noteId, string file)
