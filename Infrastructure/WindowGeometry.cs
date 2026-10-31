@@ -76,27 +76,26 @@ public static class WindowGeometry
             return;
         }
 
-        double scaleX = DipsPerPixelX(primaryScreen);
-        double scaleY = DipsPerPixelY(primaryScreen);
         System.Windows.Rect titleStrip = new System.Windows.Rect(
             window.Left, window.Top, window.Width, MinimumVisibleHeight);
 
         foreach (System.Windows.Forms.Screen screen in System.Windows.Forms.Screen.AllScreens)
         {
-            System.Windows.Rect workArea = ToDips(screen.WorkingArea, scaleX, scaleY);
-            if (workArea.IntersectsWith(titleStrip))
+            if (ToDips(screen).IntersectsWith(titleStrip))
             {
                 return;
             }
         }
 
-        System.Windows.Rect primary = ToDips(primaryScreen.WorkingArea, scaleX, scaleY);
+        System.Windows.Rect primary = ToDips(primaryScreen);
         window.Left = primary.Left + Math.Max(0, (primary.Width - window.Width) / 2);
         window.Top = primary.Top + Math.Max(0, (primary.Height - window.Height) / 2);
     }
 
-    private static System.Windows.Rect ToDips(System.Drawing.Rectangle area, double scaleX, double scaleY)
+    private static System.Windows.Rect ToDips(System.Windows.Forms.Screen screen)
     {
+        (double scaleX, double scaleY) = DipsPerPixel(screen);
+        System.Drawing.Rectangle area = screen.WorkingArea;
         return new System.Windows.Rect(
             area.Left / scaleX,
             area.Top / scaleY,
@@ -104,17 +103,58 @@ public static class WindowGeometry
             area.Height / scaleY);
     }
 
-    private static double DipsPerPixelX(System.Windows.Forms.Screen screen)
+    // Each monitor has its own scale on mixed-DPI setups; ask the OS for the
+    // monitor's effective DPI and fall back to the primary display's ratio.
+    private static (double X, double Y) DipsPerPixel(System.Windows.Forms.Screen screen)
     {
-        double pixels = screen.Bounds.Width;
-        double dips = SystemParameters.PrimaryScreenWidth;
-        return pixels > 0 && dips > 0 ? pixels / dips : 1.0;
+        try
+        {
+            POINT center = new POINT(
+                screen.Bounds.Left + screen.Bounds.Width / 2,
+                screen.Bounds.Top + screen.Bounds.Height / 2);
+            IntPtr monitor = MonitorFromPoint(center, MonitorDefaultToNearest);
+            if (GetDpiForMonitor(monitor, MonitorDpiEffective, out uint dpiX, out uint dpiY) == 0
+                && dpiX > 0 && dpiY > 0)
+            {
+                return (dpiX / 96.0, dpiY / 96.0);
+            }
+        }
+        catch (Exception ex) when (ex is DllNotFoundException or EntryPointNotFoundException
+            or System.Runtime.InteropServices.ExternalException)
+        {
+        }
+
+        System.Windows.Forms.Screen primary = System.Windows.Forms.Screen.PrimaryScreen ?? screen;
+        double fallbackX = SystemParameters.PrimaryScreenWidth > 0
+            ? primary.Bounds.Width / SystemParameters.PrimaryScreenWidth
+            : 1.0;
+        double fallbackY = SystemParameters.PrimaryScreenHeight > 0
+            ? primary.Bounds.Height / SystemParameters.PrimaryScreenHeight
+            : 1.0;
+        return (fallbackX, fallbackY);
     }
 
-    private static double DipsPerPixelY(System.Windows.Forms.Screen screen)
+    private const uint MonitorDefaultToNearest = 2;
+    private const int MonitorDpiEffective = 0;
+
+    [System.Runtime.InteropServices.DllImport("user32.dll")]
+    private static extern IntPtr MonitorFromPoint(POINT pt, uint dwFlags);
+
+    [System.Runtime.InteropServices.DllImport("shcore.dll")]
+    private static extern int GetDpiForMonitor(
+        IntPtr hmonitor, int dpiType, out uint dpiX, out uint dpiY);
+
+    [System.Runtime.InteropServices.StructLayout(
+        System.Runtime.InteropServices.LayoutKind.Sequential)]
+    private readonly struct POINT
     {
-        double pixels = screen.Bounds.Height;
-        double dips = SystemParameters.PrimaryScreenHeight;
-        return pixels > 0 && dips > 0 ? pixels / dips : 1.0;
+        public readonly int X;
+        public readonly int Y;
+
+        public POINT(int x, int y)
+        {
+            X = x;
+            Y = y;
+        }
     }
 }

@@ -50,16 +50,40 @@ public sealed class SingleInstanceGuard : IDisposable
 
     public bool IsPrimary { get; }
 
+    // The primary creates the event right after acquiring the mutex, so a fast
+    // second instance can arrive first; retry briefly instead of exiting
+    // without activating the running instance.
     public void NotifyPrimaryToShow()
     {
-        try
+        if (_showEvent is not null)
         {
-            using EventWaitHandle handle = EventWaitHandle.OpenExisting(ShowEventName);
-            handle.Set();
+            try
+            {
+                _showEvent.Set();
+                return;
+            }
+            catch (Exception ex) when (ex is UnauthorizedAccessException or IOException
+                or ObjectDisposedException)
+            {
+            }
         }
-        catch (Exception ex) when (ex is UnauthorizedAccessException or IOException
-            or WaitHandleCannotBeOpenedException)
+
+        for (int attempt = 0; attempt < 20; attempt++)
         {
+            try
+            {
+                using EventWaitHandle handle = EventWaitHandle.OpenExisting(ShowEventName);
+                handle.Set();
+                return;
+            }
+            catch (WaitHandleCannotBeOpenedException)
+            {
+                Thread.Sleep(100);
+            }
+            catch (Exception ex) when (ex is UnauthorizedAccessException or IOException)
+            {
+                return;
+            }
         }
     }
 

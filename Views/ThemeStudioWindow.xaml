@@ -9,7 +9,7 @@
         WindowStartupLocation="CenterOwner"
         FontFamily="{StaticResource AppFont}"
         Background="#FFFDF7"
-        Icon="pack://application:,,,/Resources/dikit.ico"
+        Icon="pack://application:,,,/Resources/dikit.ico">
 
     <Grid Margin="18">
         <Grid.ColumnDefinitions>
@@ -28,7 +28,8 @@
                                     CommandParameter="{Binding}"
                                     HorizontalContentAlignment="Stretch"
                                     Padding="0"
-                                    Margin="0,0,0,8">
+                                    Margin="0,0,0,8"
+                                    AutomationProperties.Name="{Binding Name, StringFormat='Preset theme {0}'}">
                                 <Border CornerRadius="10"
                                         Padding="10,8"
                                         Background="{Binding Background, Converter={StaticResource HexToBrush}}"
@@ -131,7 +132,8 @@
                          Padding="6,3"
                          HorizontalAlignment="Right"
                          MinWidth="110"
-                         ToolTip="Hex color, e.g. #FFF9DB"/>
+                         ToolTip="Hex color, e.g. #FFF9DB"
+                         AutomationProperties.Name="Hex color value"/>
             </Grid>
 
             <WrapPanel Margin="0,8,0,0">
@@ -147,7 +149,8 @@
                                     Command="{Binding DataContext.PickColorCommand, RelativeSource={RelativeSource AncestorType={x:Type Window}}}"
                                     CommandParameter="{Binding}"
                                     Background="{Binding Converter={StaticResource HexToBrush}}"
-                                    ToolTip="{Binding}"/>
+                                    ToolTip="{Binding}"
+                                    AutomationProperties.Name="{Binding, StringFormat='Color swatch {0}'}"/>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
@@ -164,14 +167,16 @@
                               SelectedItem="{Binding Working.FontFamily, Mode=TwoWay}"
                               IsEditable="True"
                               FontSize="12"
-                              Margin="0,3,12,0"/>
+                              Margin="0,3,12,0"
+                              AutomationProperties.Name="Font family"/>
                 </StackPanel>
                 <StackPanel Grid.Column="1">
                     <TextBlock Text="Theme name (for saving)" FontSize="11" Foreground="#6B6750"/>
                     <TextBox Text="{Binding Working.Name, UpdateSourceTrigger=PropertyChanged, Delay=200}"
                              FontSize="12"
                              Padding="4,2"
-                             Margin="0,3,0,0"/>
+                             Margin="0,3,0,0"
+                             AutomationProperties.Name="Theme name"/>
                 </StackPanel>
             </Grid>
 
@@ -180,12 +185,14 @@
                     <Run Text="Corner radius:"/><Run Text="{Binding Working.CornerRadius, StringFormat={}{0:0}}"/>
                 </TextBlock>
                 <Slider Minimum="0" Maximum="28" TickFrequency="1" IsSnapToTickEnabled="True"
-                        Value="{Binding Working.CornerRadius, Mode=TwoWay}"/>
+                        Value="{Binding Working.CornerRadius, Mode=TwoWay}"
+                        AutomationProperties.Name="Corner radius"/>
                 <TextBlock FontSize="11" Foreground="#6B6750" Margin="0,4,0,0">
                     <Run Text="Opacity:"/><Run Text="{Binding Working.Opacity, StringFormat={}{0:P0}}"/>
                 </TextBlock>
                 <Slider Minimum="0.4" Maximum="1" TickFrequency="0.05" IsSnapToTickEnabled="True"
-                        Value="{Binding Working.Opacity, Mode=TwoWay}"/>
+                        Value="{Binding Working.Opacity, Mode=TwoWay}"
+                        AutomationProperties.Name="Opacity"/>
             </StackPanel>
 
             <StackPanel Orientation="Horizontal" Margin="0,12,0,0" HorizontalAlignment="Right">
