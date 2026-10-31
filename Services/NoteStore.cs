@@ -304,8 +304,11 @@ public sealed class NoteStore
         {
             return JsonSerializer.Deserialize<Note>(File.ReadAllText(file), JsonOptions.Default);
         }
-        catch (Exception ex) when (ex is IOException or JsonException or UnauthorizedAccessException)
+        catch (Exception ex) when (ex is IOException or JsonException
+            or NotSupportedException or UnauthorizedAccessException)
         {
+            // NotSupportedException: valid JSON whose block discriminator is
+            // missing/misordered/unknown must not kill startup.
             warnings?.Add($"Note '{id}' failed to load: {ex.Message}");
             return null;
         }
@@ -340,7 +343,8 @@ public sealed class NoteStore
                     return note;
                 }
             }
-            catch (Exception ex) when (ex is IOException or JsonException or UnauthorizedAccessException)
+            catch (Exception ex) when (ex is IOException or JsonException
+                or NotSupportedException or UnauthorizedAccessException)
             {
                 warnings.Add($"Backup '{Path.GetFileName(backup)}' for note '{id}' is also unreadable.");
             }
