@@ -171,6 +171,14 @@ dotnet run
 
 **Lesson learned:** When a build fails, investigate the **first compilation error**. Do not use `--no-build` as a workaround for a missing executable.
 
+### Issue C — `.NET 10` ignores a `LOCALAPPDATA` environment override during smoke tests
+
+**Observed behavior (October 31, 2026):** Launching the built app with a temporary `LOCALAPPDATA` environment variable still wrote Dikit data under the user's normal Local App Data folder. This was observed on .NET 10.0.403 during Windows verification.
+
+**Resolution used for testing:** Redirect the user's `HKCU\Volatile Environment\User Shell Folders` / `HKCU\Environment\User Shell Folders` `Local AppData` value to a disposable folder for the app launch, then restore the original value. Do not leave the redirect active after the test.
+
+**Lesson learned:** For automated smoke tests that must isolate `%LOCALAPPDATA%\Dikit`, do not rely on the `LOCALAPPDATA` environment variable alone; verify the actual folder the app writes to before editing or deleting test data.
+
 ## 7. Command reference
 
 | Command                                                 | Why we use it                                                               |
@@ -212,9 +220,9 @@ Keep the source code, `.csproj`, `.xaml`, `.cs`, documentation, and any intentio
 
 ## 10. Current status and next milestone
 
-**Completed:** .NET 10 SDK recognized; C# tooling initialized; Dikit WPF project successfully launched. On `devin/dikit-v1-ios-notes`, M1–M3 plus M4 desktop integration are implemented (notes with typed blocks, JSON persistence, autosave, window restoration, image/link/checklist blocks, Theme Studio, system-tray menu with explicit Quit, searchable All notes, Settings with opt-in launch-at-sign-in, single instance, backup/quarantine recovery, `logs/` error logging) but have not yet been compiled or run — that branch was written on Linux where the WPF Windows Desktop SDK is unavailable. The project now also enables `UseWindowsForms` for the tray icon; this uses the shared Windows Desktop framework and needs no extra installer.
+**Completed:** .NET 10 SDK recognized; C# tooling initialized; Dikit WPF project successfully launched. On `devin/dikit-v1-ios-notes`, M1–M3 plus M4 desktop integration are implemented and passed a Windows smoke test on .NET 10.0.403: `dotnet restore`/`dotnet build` pass; notes create/edit/move/resize/minimize/pin/hide/restore/duplicate/delete; text, pasted/imported images, links and checklists persist; Theme Studio, tray menu, All notes search, Settings, single-instance activation, launch-at-sign-in registration, corrupt-note backup recovery, forced-kill recovery, and restart persistence were exercised. The project enables `UseWindowsForms` for the tray icon using the shared Windows Desktop framework.
 
-**Next:** On Windows, run `dotnet restore && dotnet build && dotnet run` on the branch; create and edit notes; paste a screenshot; add and open an `https://` link; toggle checklists; apply themes per note and globally; exercise the tray menu, Settings toggle, and single-instance activation; restart and verify content, geometry, open state, checked state, assets, themes, and startup registration persist. Remaining M4 work is release packaging and resource validation.
+**Next:** Merge or package the branch only after the remaining release checks in `docs/PROGRESS_STATE.md`: standalone executable launch without IDE/network, a 10-note workload, no-backup quarantine recovery, monitor-detach clamping, Wi-Fi-disabled use, RAM/storage/startup measurement, and Windows packaging/distribution.
 
 ---
 
