@@ -23,9 +23,10 @@ public sealed class ThemeStudioViewModel : ObservableObject
         _manager = manager;
         _themes = manager.Themes;
 
-        Working = note is not null
-            ? (note.Model.ThemeOverride ?? manager.Themes.Resolve(note.Model.ThemeId ?? manager.Settings.GlobalThemeId).Clone())
-            : manager.Themes.Resolve(manager.Settings.GlobalThemeId).Clone();
+        Working = (note is not null
+                ? (note.Model.ThemeOverride ?? manager.Themes.Resolve(note.Model.ThemeId ?? manager.Settings.GlobalThemeId))
+                : manager.Themes.Resolve(manager.Settings.GlobalThemeId))
+            .Clone();
 
         foreach (NoteTheme theme in _themes.All)
         {

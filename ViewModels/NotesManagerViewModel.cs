@@ -208,7 +208,7 @@ public sealed class NotesManagerViewModel : ObservableObject
             return;
         }
 
-        CreateAndOpen(copy);
+        CreateAndOpen(copy, positionNew: false);
     }
 
     public void DeleteNote(NoteViewModel vm)
@@ -301,10 +301,14 @@ public sealed class NotesManagerViewModel : ObservableObject
         }
     }
 
-    private void CreateAndOpen(Note note)
+    private void CreateAndOpen(Note note, bool positionNew = true)
     {
         NoteViewModel vm = AddViewModel(note);
-        _windows.PositionNewNote(vm, _settings);
+        if (positionNew)
+        {
+            _windows.PositionNewNote(vm, _settings);
+        }
+
         OpenNote(vm);
     }
 

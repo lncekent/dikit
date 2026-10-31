@@ -99,26 +99,6 @@ public sealed class AssetService
         return File.Exists(fullPath) ? fullPath : null;
     }
 
-    public void DeleteAsset(string noteId, string? assetId)
-    {
-        string? path = ResolvePath(noteId, assetId);
-        if (path is null)
-        {
-            return;
-        }
-
-        try
-        {
-            File.Delete(path);
-        }
-        catch (IOException)
-        {
-        }
-        catch (UnauthorizedAccessException)
-        {
-        }
-    }
-
     private static BitmapSource Downscale(BitmapSource bitmap)
     {
         int width = bitmap.PixelWidth;
