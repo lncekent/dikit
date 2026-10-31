@@ -151,7 +151,33 @@ public sealed class NoteStore
         }
 
         SaveNote(copy);
+        CopyAssets(source.Id, copy.Id);
         return copy;
+    }
+
+    private void CopyAssets(string sourceId, string targetId)
+    {
+        string source = _paths.NoteAssetsDirectory(sourceId);
+        if (!Directory.Exists(source))
+        {
+            return;
+        }
+
+        try
+        {
+            string target = _paths.NoteAssetsDirectory(targetId);
+            Directory.CreateDirectory(target);
+            foreach (string file in Directory.EnumerateFiles(source))
+            {
+                File.Copy(file, Path.Combine(target, Path.GetFileName(file)), overwrite: false);
+            }
+        }
+        catch (IOException)
+        {
+        }
+        catch (UnauthorizedAccessException)
+        {
+        }
     }
 
     public void SaveNote(Note note)

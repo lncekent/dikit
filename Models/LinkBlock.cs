@@ -18,6 +18,22 @@ public sealed class LinkBlock : ContentBlock
     public string Url
     {
         get => _url;
-        set => SetProperty(ref _url, value);
+        set
+        {
+            if (SetProperty(ref _url, value))
+            {
+                OnPropertyChanged(nameof(IsValid));
+            }
+        }
+    }
+
+    [JsonIgnore]
+    public bool IsValid
+    {
+        get
+        {
+            return Uri.TryCreate(_url, UriKind.Absolute, out Uri? uri)
+                && (uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps);
+        }
     }
 }
