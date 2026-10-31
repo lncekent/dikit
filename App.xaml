@@ -12,7 +12,7 @@
         <infra:FontFamilyStringConverter x:Key="FontFamilyString"/>
         <infra:PathToBitmapConverter x:Key="PathToBitmap"/>
 
-        <FontFamily x:Key="AppFont">Inter, Segoe UI</FontFamily>
+        <FontFamily x:Key="AppFont">./Resources/Fonts/#Inter, Segoe UI</FontFamily>
 
         <Style x:Key="ChromeButton" TargetType="ButtonBase">
             <Setter Property="Background" Value="Transparent"/>

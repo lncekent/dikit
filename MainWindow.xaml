@@ -71,7 +71,8 @@
                      Background="Transparent"
                      Foreground="#3B3A30"
                      BorderThickness="0"
-                     ToolTip="Search titles, text, links, and captions"/>
+                     ToolTip="Search titles, text, links, and captions"
+                     AutomationProperties.Name="Search notes"/>
         </Border>
 
         <Grid Grid.Row="3" Margin="0,10,0,0">
@@ -152,6 +153,7 @@
                                         <Button Style="{StaticResource ChromeButton}"
                                                 Click="Delete_Click"
                                                 Foreground="#A33B3B"
+                                                AutomationProperties.Name="{Binding Title, StringFormat='Delete note {0}'}"
                                                 Content="Delete"/>
                                     </StackPanel>
                                 </Grid>

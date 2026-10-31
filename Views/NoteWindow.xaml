@@ -45,12 +45,14 @@
                          FontWeight="SemiBold"
                          FontSize="13"
                          TextWrapping="NoWrap"
-                         VerticalContentAlignment="Center"/>
+                         VerticalContentAlignment="Center"
+                         AutomationProperties.Name="Note title"/>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
                     <ToggleButton Style="{StaticResource PinToggle}"
                                   IsChecked="{Binding IsTopMost, Mode=TwoWay}"
                                   Foreground="{Binding Theme.Foreground, Converter={StaticResource HexToBrush}}"
                                   ToolTip="Pin above other windows"
+                                  AutomationProperties.Name="Pin note above other windows"
                                   Content="Pin"/>
                     <Button Style="{StaticResource ChromeButton}"
                             Command="{Binding ThemeStudioCommand}"
@@ -61,12 +63,14 @@
                             Click="Minimize_Click"
                             Foreground="{Binding Theme.Foreground, Converter={StaticResource HexToBrush}}"
                             ToolTip="Minimize"
+                            AutomationProperties.Name="Minimize note"
                             Content="–"/>
                     <Button x:Name="MenuButton"
                             Style="{StaticResource ChromeButton}"
                             Click="MenuButton_Click"
                             Foreground="{Binding Theme.Foreground, Converter={StaticResource HexToBrush}}"
                             ToolTip="Note actions"
+                            AutomationProperties.Name="Note actions"
                             Content="⋯">
                         <Button.ContextMenu>
                             <ContextMenu DataContext="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">
@@ -79,6 +83,7 @@
                             Command="{Binding CloseCommand}"
                             Foreground="{Binding Theme.Foreground, Converter={StaticResource HexToBrush}}"
                             ToolTip="Close (note stays saved)"
+                            AutomationProperties.Name="Close note"
                             Content="×"/>
                 </StackPanel>
             </Grid>
@@ -111,61 +116,123 @@
                     </ItemsControl.ItemContainerStyle>
                     <ItemsControl.Resources>
                         <DataTemplate DataType="{x:Type models:TextBlock}">
-                            <TextBox Style="{StaticResource BlockTextBox}"
-                                     Text="{Binding Text, UpdateSourceTrigger=PropertyChanged, Delay=300}"
-                                     Margin="6,2"
-                                     Foreground="{Binding DataContext.Theme.Foreground, RelativeSource={RelativeSource AncestorType={x:Type Window}}, Converter={StaticResource HexToBrush}}"/>
+                            <DockPanel>
+                                <Button DockPanel.Dock="Right"
+                                        VerticalAlignment="Top"
+                                        Style="{StaticResource ChromeButton}"
+                                        Command="{Binding DataContext.RemoveBlockCommand, RelativeSource={RelativeSource AncestorType={x:Type Window}}}"
+                                        CommandParameter="{Binding}"
+                                        Foreground="{Binding DataContext.Theme.Foreground, RelativeSource={RelativeSource AncestorType={x:Type Window}}, Converter={StaticResource HexToBrush}}"
+                                        FontSize="11"
+                                        Opacity="0.55"
+                                        Padding="4,1"
+                                        Margin="0,2,2,0"
+                                        ToolTip="Remove block"
+                                        AutomationProperties.Name="Remove text block"
+                                        Content="×"/>
+                                <TextBox Style="{StaticResource BlockTextBox}"
+                                         Text="{Binding Text, UpdateSourceTrigger=PropertyChanged, Delay=300}"
+                                         Margin="6,2"
+                                         AutomationProperties.Name="Text block"
+                                         Foreground="{Binding DataContext.Theme.Foreground, RelativeSource={RelativeSource AncestorType={x:Type Window}}, Converter={StaticResource HexToBrush}}"/>
+                            </DockPanel>
                         </DataTemplate>
                         <DataTemplate DataType="{x:Type models:ChecklistBlock}">
-                            <StackPanel Orientation="Horizontal" Margin="6,2">
-                                <CheckBox IsChecked="{Binding IsChecked}"
-                                          VerticalAlignment="Center"
-                                          Margin="2,0,4,0"/>
-                                <TextBox Text="{Binding Text, UpdateSourceTrigger=PropertyChanged, Delay=300}"
-                                         Foreground="{Binding DataContext.Theme.Foreground, RelativeSource={RelativeSource AncestorType={x:Type Window}}, Converter={StaticResource HexToBrush}}">
-                                    <TextBox.Style>
-                                        <Style TargetType="TextBox" BasedOn="{StaticResource BlockTextBox}">
-                                            <Setter Property="AcceptsReturn" Value="False"/>
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding IsChecked}" Value="True">
-                                                    <Setter Property="TextDecorations" Value="Strikethrough"/>
-                                                    <Setter Property="Opacity" Value="0.55"/>
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </TextBox.Style>
-                                </TextBox>
-                            </StackPanel>
+                            <DockPanel Margin="6,2">
+                                <Button DockPanel.Dock="Right"
+                                        VerticalAlignment="Top"
+                                        Style="{StaticResource ChromeButton}"
+                                        Command="{Binding DataContext.RemoveBlockCommand, RelativeSource={RelativeSource AncestorType={x:Type Window}}}"
+                                        CommandParameter="{Binding}"
+                                        Foreground="{Binding DataContext.Theme.Foreground, RelativeSource={RelativeSource AncestorType={x:Type Window}}, Converter={StaticResource HexToBrush}}"
+                                        FontSize="11"
+                                        Opacity="0.55"
+                                        Padding="4,1"
+                                        ToolTip="Remove block"
+                                        AutomationProperties.Name="Remove checklist item"
+                                        Content="×"/>
+                                <StackPanel Orientation="Horizontal">
+                                    <CheckBox IsChecked="{Binding IsChecked}"
+                                              VerticalAlignment="Center"
+                                              Margin="2,0,4,0"
+                                              AutomationProperties.Name="Checklist item done"/>
+                                    <TextBox Text="{Binding Text, UpdateSourceTrigger=PropertyChanged, Delay=300}"
+                                             AutomationProperties.Name="Checklist item"
+                                             Foreground="{Binding DataContext.Theme.Foreground, RelativeSource={RelativeSource AncestorType={x:Type Window}}, Converter={StaticResource HexToBrush}}">
+                                        <TextBox.Style>
+                                            <Style TargetType="TextBox" BasedOn="{StaticResource BlockTextBox}">
+                                                <Setter Property="AcceptsReturn" Value="False"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsChecked}" Value="True">
+                                                        <Setter Property="TextDecorations" Value="Strikethrough"/>
+                                                        <Setter Property="Opacity" Value="0.55"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBox.Style>
+                                    </TextBox>
+                                </StackPanel>
+                            </DockPanel>
                         </DataTemplate>
                         <DataTemplate DataType="{x:Type models:LinkBlock}">
-                            <StackPanel Margin="6,3">
-                                <DockPanel>
-                                    <Button DockPanel.Dock="Right"
-                                            Style="{StaticResource ChromeButton}"
-                                            Command="{Binding DataContext.OpenLinkCommand, RelativeSource={RelativeSource AncestorType={x:Type Window}}}"
-                                            CommandParameter="{Binding}"
-                                            IsEnabled="{Binding IsValid}"
-                                            Foreground="{Binding DataContext.Theme.Accent, RelativeSource={RelativeSource AncestorType={x:Type Window}}, Converter={StaticResource HexToBrush}}"
-                                            FontWeight="SemiBold"
-                                            ToolTip="Open in default browser (http/https only)"
-                                            Content="Open ↗"/>
+                            <DockPanel Margin="6,3">
+                                <Button DockPanel.Dock="Right"
+                                        VerticalAlignment="Top"
+                                        Style="{StaticResource ChromeButton}"
+                                        Command="{Binding DataContext.RemoveBlockCommand, RelativeSource={RelativeSource AncestorType={x:Type Window}}}"
+                                        CommandParameter="{Binding}"
+                                        Foreground="{Binding DataContext.Theme.Foreground, RelativeSource={RelativeSource AncestorType={x:Type Window}}, Converter={StaticResource HexToBrush}}"
+                                        FontSize="11"
+                                        Opacity="0.55"
+                                        Padding="4,1"
+                                        ToolTip="Remove block"
+                                        AutomationProperties.Name="Remove link block"
+                                        Content="×"/>
+                                <StackPanel>
+                                    <DockPanel>
+                                        <Button DockPanel.Dock="Right"
+                                                Style="{StaticResource ChromeButton}"
+                                                Command="{Binding DataContext.OpenLinkCommand, RelativeSource={RelativeSource AncestorType={x:Type Window}}}"
+                                                CommandParameter="{Binding}"
+                                                IsEnabled="{Binding IsValid}"
+                                                Foreground="{Binding DataContext.Theme.Accent, RelativeSource={RelativeSource AncestorType={x:Type Window}}, Converter={StaticResource HexToBrush}}"
+                                                FontWeight="SemiBold"
+                                                ToolTip="Open in default browser (http/https only)"
+                                                AutomationProperties.Name="Open link in browser"
+                                                Content="Open ↗"/>
+                                        <TextBox Style="{StaticResource BlockTextBox}"
+                                                 Text="{Binding Text, UpdateSourceTrigger=PropertyChanged, Delay=300}"
+                                                 AcceptsReturn="False"
+                                                 FontWeight="SemiBold"
+                                                 AutomationProperties.Name="Link label"
+                                                 Foreground="{Binding DataContext.Theme.Accent, RelativeSource={RelativeSource AncestorType={x:Type Window}}, Converter={StaticResource HexToBrush}}"/>
+                                    </DockPanel>
                                     <TextBox Style="{StaticResource BlockTextBox}"
-                                             Text="{Binding Text, UpdateSourceTrigger=PropertyChanged, Delay=300}"
+                                             Text="{Binding Url, UpdateSourceTrigger=PropertyChanged, Delay=300}"
                                              AcceptsReturn="False"
-                                             FontWeight="SemiBold"
-                                             Foreground="{Binding DataContext.Theme.Accent, RelativeSource={RelativeSource AncestorType={x:Type Window}}, Converter={StaticResource HexToBrush}}"/>
-                                </DockPanel>
-                                <TextBox Style="{StaticResource BlockTextBox}"
-                                         Text="{Binding Url, UpdateSourceTrigger=PropertyChanged, Delay=300}"
-                                         AcceptsReturn="False"
-                                         FontSize="11"
-                                         Opacity="0.7"
-                                         ToolTip="Only http:// and https:// links can be opened."
-                                         Foreground="{Binding DataContext.Theme.Foreground, RelativeSource={RelativeSource AncestorType={x:Type Window}}, Converter={StaticResource HexToBrush}}"/>
-                            </StackPanel>
+                                             FontSize="11"
+                                             Opacity="0.7"
+                                             ToolTip="Only http:// and https:// links can be opened."
+                                             AutomationProperties.Name="Link URL"
+                                             Foreground="{Binding DataContext.Theme.Foreground, RelativeSource={RelativeSource AncestorType={x:Type Window}}, Converter={StaticResource HexToBrush}}"/>
+                                </StackPanel>
+                            </DockPanel>
                         </DataTemplate>
                         <DataTemplate DataType="{x:Type models:ImageBlock}">
-                            <StackPanel Margin="6,4">
+                            <DockPanel Margin="6,4">
+                                <Button DockPanel.Dock="Right"
+                                        VerticalAlignment="Top"
+                                        Style="{StaticResource ChromeButton}"
+                                        Command="{Binding DataContext.RemoveBlockCommand, RelativeSource={RelativeSource AncestorType={x:Type Window}}}"
+                                        CommandParameter="{Binding}"
+                                        Foreground="{Binding DataContext.Theme.Foreground, RelativeSource={RelativeSource AncestorType={x:Type Window}}, Converter={StaticResource HexToBrush}}"
+                                        FontSize="11"
+                                        Opacity="0.55"
+                                        Padding="4,1"
+                                        ToolTip="Remove block"
+                                        AutomationProperties.Name="Remove image block"
+                                        Content="×"/>
+                                <StackPanel>
                                 <Border CornerRadius="10"
                                         ClipToBounds="True"
                                         HorizontalAlignment="Left"
@@ -193,8 +260,10 @@
                                          FontStyle="Italic"
                                          Opacity="0.75"
                                          ToolTip="Caption"
+                                         AutomationProperties.Name="Image caption"
                                          Foreground="{Binding DataContext.Theme.Foreground, RelativeSource={RelativeSource AncestorType={x:Type Window}}, Converter={StaticResource HexToBrush}}"/>
-                            </StackPanel>
+                                </StackPanel>
+                            </DockPanel>
                         </DataTemplate>
                     </ItemsControl.Resources>
                 </ItemsControl>

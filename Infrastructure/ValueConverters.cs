@@ -89,14 +89,23 @@ public sealed class NullToVisibleConverter : IValueConverter
 
 public sealed class FontFamilyStringConverter : IValueConverter
 {
+    // Inter is bundled under Resources/Fonts, so "Inter" resolves to the pack URI;
+    // every other family name resolves against installed fonts with a Segoe UI fallback.
+    internal const string BundledInter = "./Resources/Fonts/#Inter";
+
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
         if (value is string name && !string.IsNullOrWhiteSpace(name))
         {
+            if (string.Equals(name.Trim(), "Inter", StringComparison.OrdinalIgnoreCase))
+            {
+                return new System.Windows.Media.FontFamily(BundledInter + ", Segoe UI");
+            }
+
             return new System.Windows.Media.FontFamily(name + ", Segoe UI");
         }
 
-        return new System.Windows.Media.FontFamily("Inter, Segoe UI");
+        return new System.Windows.Media.FontFamily(BundledInter + ", Segoe UI");
     }
 
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

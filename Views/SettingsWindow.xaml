@@ -39,7 +39,8 @@
                      Margin="8,0,0,0"
                      Padding="4,2"
                      FontSize="12"
-                     HorizontalContentAlignment="Center"/>
+                     HorizontalContentAlignment="Center"
+                     AutomationProperties.Name="Backups kept per note"/>
         </StackPanel>
 
         <StackPanel Grid.Row="3" Margin="0,14,0,0">
