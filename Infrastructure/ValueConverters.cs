@@ -1,7 +1,9 @@
 using System.Globalization;
+using System.IO;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 
 namespace dikit.Infrastructure;
 
@@ -58,6 +60,84 @@ public sealed class ZeroToCollapsedConverter : IValueConverter
         }
 
         return Visibility.Visible;
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        throw new NotSupportedException();
+    }
+}
+
+public sealed class NullToVisibleConverter : IValueConverter
+{
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        if (value is null || (value is string text && string.IsNullOrWhiteSpace(text)))
+        {
+            return Visibility.Visible;
+        }
+
+        return Visibility.Collapsed;
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        throw new NotSupportedException();
+    }
+}
+
+public sealed class FontFamilyStringConverter : IValueConverter
+{
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        if (value is string name && !string.IsNullOrWhiteSpace(name))
+        {
+            return new FontFamily(name + ", Segoe UI");
+        }
+
+        return new FontFamily("Inter, Segoe UI");
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        if (value is FontFamily family && !string.IsNullOrWhiteSpace(family.Source))
+        {
+            return family.Source;
+        }
+
+        return "Inter";
+    }
+}
+
+public sealed class PathToBitmapConverter : IValueConverter
+{
+    private const int DecodeWidth = 640;
+
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        if (value is not string path || string.IsNullOrWhiteSpace(path) || !File.Exists(path))
+        {
+            return DependencyProperty.UnsetValue;
+        }
+
+        try
+        {
+            // DecodePixelWidth keeps large screenshots bounded instead of decoding at full size.
+            BitmapImage bitmap = new BitmapImage();
+            bitmap.BeginInit();
+            bitmap.CacheOption = BitmapCacheOption.OnLoad;
+            bitmap.DecodePixelWidth = DecodeWidth;
+            bitmap.CreateOptions = BitmapCreateOptions.IgnoreColorProfile;
+            bitmap.UriSource = new Uri(path, UriKind.Absolute);
+            bitmap.EndInit();
+            bitmap.Freeze();
+            return bitmap;
+        }
+        catch (Exception ex) when (ex is IOException or NotSupportedException or UriFormatException
+            or UnauthorizedAccessException or FileFormatException)
+        {
+            return DependencyProperty.UnsetValue;
+        }
     }
 
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

@@ -8,10 +8,10 @@
         Background="Transparent"
         ShowInTaskbar="True"
         MinWidth="240"
-        MinHeight="200"
+        MinHeight="220"
         Topmost="{Binding IsTopMost, Mode=TwoWay}"
         Opacity="{Binding Theme.Opacity}"
-        FontFamily="{StaticResource AppFont}">
+        FontFamily="{Binding Theme.FontFamily, Converter={StaticResource FontFamilyString}}">
 
     <Border Margin="10"
             CornerRadius="{Binding Theme.CornerRadius, Converter={StaticResource ToCornerRadius}}"
@@ -28,6 +28,7 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
             <Grid x:Name="TitleBar"
@@ -35,7 +36,7 @@
                   Background="Transparent"
                   MouseLeftButtonDown="TitleBar_MouseLeftButtonDown">
                 <TextBox Text="{Binding Title, UpdateSourceTrigger=PropertyChanged, Delay=200}"
-                         Margin="8,2,140,2"
+                         Margin="8,2,175,2"
                          Padding="0,2"
                          BorderThickness="0"
                          Background="Transparent"
@@ -50,6 +51,11 @@
                                   Foreground="{Binding Theme.Foreground, Converter={StaticResource HexToBrush}}"
                                   ToolTip="Pin above other windows"
                                   Content="Pin"/>
+                    <Button Style="{StaticResource ChromeButton}"
+                            Command="{Binding ThemeStudioCommand}"
+                            Foreground="{Binding Theme.Foreground, Converter={StaticResource HexToBrush}}"
+                            ToolTip="Theme"
+                            Content="Theme"/>
                     <Button Style="{StaticResource ChromeButton}"
                             Click="Minimize_Click"
                             Foreground="{Binding Theme.Foreground, Converter={StaticResource HexToBrush}}"
@@ -83,7 +89,7 @@
                     Opacity="0.45"/>
 
             <ScrollViewer Grid.Row="2"
-                          Margin="4,2,4,8"
+                          Margin="4,2,4,4"
                           VerticalScrollBarVisibility="Auto">
                 <ItemsControl ItemsSource="{Binding Blocks}">
                     <ItemsControl.ItemsPanel>
@@ -91,58 +97,143 @@
                             <StackPanel/>
                         </ItemsPanelTemplate>
                     </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemContainerStyle>
+                        <Style TargetType="ContentPresenter">
+                            <Setter Property="ContextMenu">
+                                <Setter.Value>
+                                    <ContextMenu>
+                                        <MenuItem Header="Remove block" Click="RemoveBlockMenuItem_Click"/>
+                                    </ContextMenu>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </ItemsControl.ItemContainerStyle>
                     <ItemsControl.Resources>
                         <DataTemplate DataType="{x:Type models:TextBlock}">
-                            <TextBox Text="{Binding Text, UpdateSourceTrigger=PropertyChanged, Delay=300}"
-                                     AcceptsReturn="True"
-                                     TextWrapping="Wrap"
-                                     BorderThickness="0"
-                                     Background="Transparent"
-                                     Foreground="{Binding DataContext.Theme.Foreground, RelativeSource={RelativeSource AncestorType={x:Type Window}}, Converter={StaticResource HexToBrush}}"
-                                     FontSize="13"
-                                     Padding="6,4"/>
+                            <TextBox Style="{StaticResource BlockTextBox}"
+                                     Text="{Binding Text, UpdateSourceTrigger=PropertyChanged, Delay=300}"
+                                     Margin="6,2"
+                                     Foreground="{Binding DataContext.Theme.Foreground, RelativeSource={RelativeSource AncestorType={x:Type Window}}, Converter={StaticResource HexToBrush}}"/>
                         </DataTemplate>
                         <DataTemplate DataType="{x:Type models:ChecklistBlock}">
                             <StackPanel Orientation="Horizontal" Margin="6,2">
-                                <CheckBox IsChecked="{Binding IsChecked}" VerticalAlignment="Center"/>
+                                <CheckBox IsChecked="{Binding IsChecked}"
+                                          VerticalAlignment="Center"
+                                          Margin="2,0,4,0"/>
                                 <TextBox Text="{Binding Text, UpdateSourceTrigger=PropertyChanged, Delay=300}"
-                                         MinWidth="120"
-                                         BorderThickness="0"
-                                         Background="Transparent"
-                                         Foreground="{Binding DataContext.Theme.Foreground, RelativeSource={RelativeSource AncestorType={x:Type Window}}, Converter={StaticResource HexToBrush}}"
-                                         FontSize="13"
-                                         VerticalContentAlignment="Center"/>
+                                         Foreground="{Binding DataContext.Theme.Foreground, RelativeSource={RelativeSource AncestorType={x:Type Window}}, Converter={StaticResource HexToBrush}}">
+                                    <TextBox.Style>
+                                        <Style TargetType="TextBox" BasedOn="{StaticResource BlockTextBox}">
+                                            <Setter Property="AcceptsReturn" Value="False"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsChecked}" Value="True">
+                                                    <Setter Property="TextDecorations" Value="Strikethrough"/>
+                                                    <Setter Property="Opacity" Value="0.55"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBox.Style>
+                                </TextBox>
                             </StackPanel>
                         </DataTemplate>
                         <DataTemplate DataType="{x:Type models:LinkBlock}">
-                            <StackPanel Margin="6,4">
-                                <TextBlock Text="{Binding Text}"
-                                           FontSize="13"
-                                           TextDecorations="Underline"
-                                           Foreground="{Binding DataContext.Theme.Accent, RelativeSource={RelativeSource AncestorType={x:Type Window}}, Converter={StaticResource HexToBrush}}"/>
-                                <TextBlock Text="{Binding Url}"
-                                           FontSize="11"
-                                           Opacity="0.65"
-                                           TextWrapping="Wrap"
-                                           Foreground="{Binding DataContext.Theme.Foreground, RelativeSource={RelativeSource AncestorType={x:Type Window}}, Converter={StaticResource HexToBrush}}"/>
+                            <StackPanel Margin="6,3">
+                                <DockPanel>
+                                    <Button DockPanel.Dock="Right"
+                                            Style="{StaticResource ChromeButton}"
+                                            Command="{Binding DataContext.OpenLinkCommand, RelativeSource={RelativeSource AncestorType={x:Type Window}}}"
+                                            CommandParameter="{Binding}"
+                                            IsEnabled="{Binding IsValid}"
+                                            Foreground="{Binding DataContext.Theme.Accent, RelativeSource={RelativeSource AncestorType={x:Type Window}}, Converter={StaticResource HexToBrush}}"
+                                            FontWeight="SemiBold"
+                                            ToolTip="Open in default browser (http/https only)"
+                                            Content="Open ↗"/>
+                                    <TextBox Style="{StaticResource BlockTextBox}"
+                                             Text="{Binding Text, UpdateSourceTrigger=PropertyChanged, Delay=300}"
+                                             AcceptsReturn="False"
+                                             FontWeight="SemiBold"
+                                             Foreground="{Binding DataContext.Theme.Accent, RelativeSource={RelativeSource AncestorType={x:Type Window}}, Converter={StaticResource HexToBrush}}"/>
+                                </DockPanel>
+                                <TextBox Style="{StaticResource BlockTextBox}"
+                                         Text="{Binding Url, UpdateSourceTrigger=PropertyChanged, Delay=300}"
+                                         AcceptsReturn="False"
+                                         FontSize="11"
+                                         Opacity="0.7"
+                                         ToolTip="Only http:// and https:// links can be opened."
+                                         Foreground="{Binding DataContext.Theme.Foreground, RelativeSource={RelativeSource AncestorType={x:Type Window}}, Converter={StaticResource HexToBrush}}"/>
                             </StackPanel>
                         </DataTemplate>
                         <DataTemplate DataType="{x:Type models:ImageBlock}">
-                            <Border Margin="6,4"
-                                    Padding="14,10"
-                                    CornerRadius="8"
-                                    BorderThickness="1"
-                                    BorderBrush="{Binding DataContext.Theme.Accent, RelativeSource={RelativeSource AncestorType={x:Type Window}}, Converter={StaticResource HexToBrush}}">
-                                <TextBlock Text="{Binding Alt, TargetNullValue='Image attachment', FallbackValue='Image attachment'}"
-                                           FontSize="11"
-                                           FontStyle="Italic"
-                                           Opacity="0.7"
-                                           Foreground="{Binding DataContext.Theme.Foreground, RelativeSource={RelativeSource AncestorType={x:Type Window}}, Converter={StaticResource HexToBrush}}"/>
-                            </Border>
+                            <StackPanel Margin="6,4">
+                                <Border CornerRadius="10"
+                                        ClipToBounds="True"
+                                        HorizontalAlignment="Left"
+                                        MaxWidth="520"
+                                        BorderThickness="1"
+                                        BorderBrush="{Binding DataContext.Theme.Accent, RelativeSource={RelativeSource AncestorType={x:Type Window}}, Converter={StaticResource HexToBrush}}">
+                                    <Grid MinWidth="80" MinHeight="28">
+                                        <TextBlock Text="Image unavailable"
+                                                   FontSize="11"
+                                                   FontStyle="Italic"
+                                                   Opacity="0.6"
+                                                   Margin="10,6"
+                                                   Visibility="{Binding ResolvedPath, Converter={StaticResource NullToVisible}}"
+                                                   Foreground="{Binding DataContext.Theme.Foreground, RelativeSource={RelativeSource AncestorType={x:Type Window}}, Converter={StaticResource HexToBrush}}"/>
+                                        <Image Source="{Binding ResolvedPath, Converter={StaticResource PathToBitmap}}"
+                                               Stretch="Uniform"
+                                               MaxHeight="300"
+                                               HorizontalAlignment="Left"/>
+                                    </Grid>
+                                </Border>
+                                <TextBox Style="{StaticResource BlockTextBox}"
+                                         Text="{Binding Alt, UpdateSourceTrigger=PropertyChanged, Delay=300}"
+                                         AcceptsReturn="False"
+                                         FontSize="11"
+                                         FontStyle="Italic"
+                                         Opacity="0.75"
+                                         ToolTip="Caption"
+                                         Foreground="{Binding DataContext.Theme.Foreground, RelativeSource={RelativeSource AncestorType={x:Type Window}}, Converter={StaticResource HexToBrush}}"/>
+                            </StackPanel>
                         </DataTemplate>
                     </ItemsControl.Resources>
                 </ItemsControl>
             </ScrollViewer>
+
+            <Border Grid.Row="3"
+                    Margin="6,0,6,6"
+                    Padding="4,2"
+                    CornerRadius="9"
+                    Background="#14000000">
+                <StackPanel Orientation="Horizontal">
+                    <Button Style="{StaticResource ChromeButton}"
+                            Command="{Binding AddTextBlockCommand}"
+                            Foreground="{Binding Theme.Foreground, Converter={StaticResource HexToBrush}}"
+                            ToolTip="Add a text block"
+                            Content="+ Text"/>
+                    <Button Style="{StaticResource ChromeButton}"
+                            Command="{Binding AddChecklistBlockCommand}"
+                            Foreground="{Binding Theme.Foreground, Converter={StaticResource HexToBrush}}"
+                            ToolTip="Add a checklist item"
+                            Content="+ Checklist"/>
+                    <Button Style="{StaticResource ChromeButton}"
+                            Command="{Binding AddLinkBlockCommand}"
+                            Foreground="{Binding Theme.Foreground, Converter={StaticResource HexToBrush}}"
+                            ToolTip="Add a link"
+                            Content="+ Link"/>
+                    <Button Style="{StaticResource ChromeButton}"
+                            Click="AddImage_Click"
+                            Foreground="{Binding Theme.Foreground, Converter={StaticResource HexToBrush}}"
+                            ToolTip="Add an image file (or paste with Ctrl+V)"
+                            Content="+ Image"/>
+                    <TextBlock Text="Ctrl+V pastes images and links"
+                               FontSize="10"
+                               Opacity="0.5"
+                               Margin="8,0,6,0"
+                               VerticalAlignment="Center"
+                               HorizontalAlignment="Right"
+                               Foreground="{Binding Theme.Foreground, Converter={StaticResource HexToBrush}}"/>
+                </StackPanel>
+            </Border>
         </Grid>
     </Border>
 </Window>

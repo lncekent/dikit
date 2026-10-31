@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Windows.Media.Imaging;
 using dikit.Infrastructure;
 using dikit.Models;
 using dikit.Services;
@@ -14,25 +15,53 @@ public sealed class NoteViewModel : ObservableObject
     private readonly Note _note;
     private readonly NoteStore _store;
     private readonly AppSettings _settings;
+    private readonly AssetService _assets;
+    private readonly ThemeService _themes;
     private readonly Debouncer _saver = new Debouncer(AutosaveDelay);
 
-    public NoteViewModel(Note note, NoteStore store, AppSettings settings)
+    public NoteViewModel(
+        Note note,
+        NoteStore store,
+        AppSettings settings,
+        AssetService assets,
+        ThemeService themes)
     {
         _note = note;
         _store = store;
         _settings = settings;
+        _assets = assets;
+        _themes = themes;
 
         CloseCommand = new RelayCommand(() => HideRequested?.Invoke(this));
         TogglePinCommand = new RelayCommand(() => IsTopMost = !IsTopMost);
         DuplicateCommand = new RelayCommand(() => DuplicateRequested?.Invoke(this));
         DeleteCommand = new RelayCommand(() => DeleteRequested?.Invoke(this));
+        ThemeStudioCommand = new RelayCommand(() => ThemeStudioRequested?.Invoke(this));
+        AddTextBlockCommand = new RelayCommand(() => _note.Blocks.Add(new TextBlock()));
+        AddChecklistBlockCommand = new RelayCommand(() => _note.Blocks.Add(new ChecklistBlock()));
+        AddLinkBlockCommand = new RelayCommand(() => _note.Blocks.Add(new LinkBlock()));
+        RemoveBlockCommand = new RelayCommand(parameter =>
+        {
+            if (parameter is ContentBlock block)
+            {
+                RemoveBlock(block);
+            }
+        });
+        OpenLinkCommand = new RelayCommand(parameter =>
+        {
+            if (parameter is LinkBlock link)
+            {
+                LinkLauncher.TryOpen(link.Url);
+            }
+        });
 
         _note.PropertyChanged += OnModelPropertyChanged;
         _note.Window.PropertyChanged += OnModelPropertyChanged;
         _note.Blocks.CollectionChanged += OnBlocksCollectionChanged;
+        AttachThemeOverride(_note.ThemeOverride);
         foreach (ContentBlock block in _note.Blocks)
         {
-            block.PropertyChanged += OnModelPropertyChanged;
+            AttachBlock(block);
         }
     }
 
@@ -41,6 +70,8 @@ public sealed class NoteViewModel : ObservableObject
     public event Action<NoteViewModel>? DeleteRequested;
 
     public event Action<NoteViewModel>? DuplicateRequested;
+
+    public event Action<NoteViewModel>? ThemeStudioRequested;
 
     public Note Model => _note;
 
@@ -67,7 +98,7 @@ public sealed class NoteViewModel : ObservableObject
     public string UpdatedText => _note.UpdatedUtc.ToLocalTime().ToString("g");
 
     public NoteTheme Theme =>
-        _note.ThemeOverride ?? ThemeCatalog.Resolve(_note.ThemeId ?? _settings.GlobalThemeId);
+        _note.ThemeOverride ?? _themes.Resolve(_note.ThemeId ?? _settings.GlobalThemeId);
 
     public RelayCommand CloseCommand { get; }
 
@@ -76,6 +107,76 @@ public sealed class NoteViewModel : ObservableObject
     public RelayCommand DuplicateCommand { get; }
 
     public RelayCommand DeleteCommand { get; }
+
+    public RelayCommand ThemeStudioCommand { get; }
+
+    public RelayCommand AddTextBlockCommand { get; }
+
+    public RelayCommand AddChecklistBlockCommand { get; }
+
+    public RelayCommand AddLinkBlockCommand { get; }
+
+    public RelayCommand RemoveBlockCommand { get; }
+
+    public RelayCommand OpenLinkCommand { get; }
+
+    public void AddLinkFromUrl(string url)
+    {
+        _note.Blocks.Add(new LinkBlock { Text = url, Url = url });
+    }
+
+    public bool AddImageFromBitmap(BitmapSource bitmap)
+    {
+        string? assetId = _assets.SaveBitmap(_note.Id, bitmap);
+        if (assetId is null)
+        {
+            return false;
+        }
+
+        _note.Blocks.Add(new ImageBlock { AssetId = assetId });
+        return true;
+    }
+
+    public bool AddImageFromFile(string sourcePath)
+    {
+        string? assetId = _assets.ImportFile(_note.Id, sourcePath);
+        if (assetId is null)
+        {
+            return false;
+        }
+
+        _note.Blocks.Add(new ImageBlock { AssetId = assetId });
+        return true;
+    }
+
+    public void RemoveBlock(ContentBlock block)
+    {
+        if (!_note.Blocks.Remove(block))
+        {
+            return;
+        }
+
+        if (block is ImageBlock image
+            && !_note.Blocks.OfType<ImageBlock>().Any(b => b.AssetId == image.AssetId))
+        {
+            _assets.DeleteAsset(_note.Id, image.AssetId);
+        }
+    }
+
+    public void ApplyTheme(NoteTheme theme)
+    {
+        _note.ThemeOverride = theme;
+    }
+
+    public void ClearThemeOverride()
+    {
+        _note.ThemeOverride = null;
+    }
+
+    public void RefreshTheme()
+    {
+        OnPropertyChanged(nameof(Theme));
+    }
 
     public void SaveNow()
     {
@@ -88,6 +189,23 @@ public sealed class NoteViewModel : ObservableObject
     {
         _note.UpdatedUtc = DateTimeOffset.UtcNow;
         _saver.Schedule(SaveNow);
+    }
+
+    private void AttachBlock(ContentBlock block)
+    {
+        block.PropertyChanged += OnModelPropertyChanged;
+        if (block is ImageBlock image)
+        {
+            image.ResolvedPath = _assets.ResolvePath(_note.Id, image.AssetId);
+        }
+    }
+
+    private void AttachThemeOverride(NoteTheme? theme)
+    {
+        if (theme is not null)
+        {
+            theme.PropertyChanged += OnModelPropertyChanged;
+        }
     }
 
     private void OnModelPropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -115,6 +233,16 @@ public sealed class NoteViewModel : ObservableObject
             {
                 OnPropertyChanged(nameof(Title));
             }
+            else if (e.PropertyName == nameof(Note.ThemeId)
+                || e.PropertyName == nameof(Note.ThemeOverride))
+            {
+                if (e.PropertyName == nameof(Note.ThemeOverride))
+                {
+                    AttachThemeOverride(_note.ThemeOverride);
+                }
+
+                OnPropertyChanged(nameof(Theme));
+            }
         }
 
         Touch();
@@ -134,7 +262,7 @@ public sealed class NoteViewModel : ObservableObject
         {
             foreach (ContentBlock block in e.NewItems)
             {
-                block.PropertyChanged += OnModelPropertyChanged;
+                AttachBlock(block);
             }
         }
 
@@ -142,7 +270,7 @@ public sealed class NoteViewModel : ObservableObject
         {
             foreach (ContentBlock block in blocks)
             {
-                block.PropertyChanged += OnModelPropertyChanged;
+                AttachBlock(block);
             }
         }
 
