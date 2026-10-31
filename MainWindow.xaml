@@ -132,9 +132,9 @@
                                                    Foreground="#3B3A30"
                                                    TextTrimming="CharacterEllipsis"/>
                                         <TextBlock FontSize="11" Foreground="#8A8668" Margin="0,2,0,0">
-                                            <Run Text="{Binding StatusText}"/>
+                                            <Run Text="{Binding StatusText, Mode=OneWay}"/>
                                             <Run Text="·"/>
-                                            <Run Text="{Binding UpdatedText}"/>
+                                            <Run Text="{Binding UpdatedText, Mode=OneWay}"/>
                                         </TextBlock>
                                     </StackPanel>
                                     <StackPanel Grid.Column="1"
