@@ -28,10 +28,13 @@ public static class WindowGeometry
 
     public static void Capture(Window window, WindowPlacement placement)
     {
-        placement.X = window.Left;
-        placement.Y = window.Top;
-        placement.Width = window.Width;
-        placement.Height = window.Height;
+        // RestoreBounds keeps the last Normal geometry; during the minimize
+        // transition Left/Top/Width/Height already hold the collapsed rect.
+        Rect bounds = window.RestoreBounds;
+        placement.X = bounds.Left;
+        placement.Y = bounds.Top;
+        placement.Width = bounds.Width;
+        placement.Height = bounds.Height;
     }
 
     private static double LeftBound(double width)

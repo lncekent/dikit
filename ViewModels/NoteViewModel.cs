@@ -167,7 +167,7 @@ public sealed class NoteViewModel : ObservableObject
 
     public void ApplyTheme(NoteTheme theme)
     {
-        _note.ThemeOverride = theme;
+        _note.ThemeOverride = theme.Clone();
     }
 
     public void ClearThemeOverride()
