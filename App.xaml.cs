@@ -16,8 +16,11 @@ public partial class App : Application
         AppPaths paths = new AppPaths();
         paths.EnsureDirectories();
         NoteStore store = new NoteStore(paths);
+        AssetService assets = new AssetService(paths);
+        ThemeService themes = new ThemeService(paths);
         StoreLoadResult loaded = store.LoadAll();
-        _manager = new NotesManagerViewModel(store, loaded.Notes, loaded.Warnings, loaded.Settings);
+        _manager = new NotesManagerViewModel(
+            store, loaded.Notes, loaded.Warnings, loaded.Settings, assets, themes);
 
         MainWindow launcher = new MainWindow { DataContext = _manager };
         MainWindow = launcher;

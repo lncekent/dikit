@@ -7,6 +7,9 @@
         <infra:HexToBrushConverter x:Key="HexToBrush"/>
         <infra:DoubleToCornerRadiusConverter x:Key="ToCornerRadius"/>
         <infra:ZeroToCollapsedConverter x:Key="ZeroToCollapsed"/>
+        <infra:NullToVisibleConverter x:Key="NullToVisible"/>
+        <infra:FontFamilyStringConverter x:Key="FontFamilyString"/>
+        <infra:PathToBitmapConverter x:Key="PathToBitmap"/>
 
         <FontFamily x:Key="AppFont">Inter, Segoe UI</FontFamily>
 
@@ -31,6 +34,39 @@
                             </Trigger>
                             <Trigger Property="IsEnabled" Value="False">
                                 <Setter Property="Opacity" Value="0.4"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="BlockTextBox" TargetType="TextBox">
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Padding" Value="2,3"/>
+            <Setter Property="TextWrapping" Value="Wrap"/>
+            <Setter Property="AcceptsReturn" Value="True"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+
+        <Style x:Key="SwatchButton" TargetType="ButtonBase">
+            <Setter Property="Width" Value="26"/>
+            <Setter Property="Height" Value="26"/>
+            <Setter Property="Margin" Value="0,0,6,6"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ButtonBase">
+                        <Border CornerRadius="13"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="#22000000"
+                                BorderThickness="1"/>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="BorderBrush" Value="#80000000"/>
+                                <Setter Property="BorderThickness" Value="1.5"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>

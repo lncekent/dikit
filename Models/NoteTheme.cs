@@ -77,4 +77,41 @@ public sealed class NoteTheme : ObservableObject
         get => _isBuiltIn;
         set => SetProperty(ref _isBuiltIn, value);
     }
+
+    public NoteTheme Clone()
+    {
+        return new NoteTheme
+        {
+            Id = Id,
+            Name = Name,
+            Background = Background,
+            Foreground = Foreground,
+            Accent = Accent,
+            FontFamily = FontFamily,
+            CornerRadius = CornerRadius,
+            Opacity = Opacity,
+            IsBuiltIn = IsBuiltIn,
+        };
+    }
+
+    public void CopyStyleFrom(NoteTheme other)
+    {
+        Name = other.Name;
+        Background = other.Background;
+        Foreground = other.Foreground;
+        Accent = other.Accent;
+        FontFamily = other.FontFamily;
+        CornerRadius = other.CornerRadius;
+        Opacity = other.Opacity;
+    }
+
+    public bool StyleEquals(NoteTheme other)
+    {
+        return string.Equals(Background, other.Background, StringComparison.OrdinalIgnoreCase)
+            && string.Equals(Foreground, other.Foreground, StringComparison.OrdinalIgnoreCase)
+            && string.Equals(Accent, other.Accent, StringComparison.OrdinalIgnoreCase)
+            && string.Equals(FontFamily, other.FontFamily, StringComparison.Ordinal)
+            && CornerRadius == other.CornerRadius
+            && Opacity == other.Opacity;
+    }
 }

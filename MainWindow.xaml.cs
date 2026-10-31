@@ -10,6 +10,14 @@ public partial class MainWindow : Window
         InitializeComponent();
     }
 
+    private void ThemeStudio_Click(object sender, RoutedEventArgs e)
+    {
+        if (DataContext is NotesManagerViewModel manager)
+        {
+            manager.OpenThemeStudio(null);
+        }
+    }
+
     private void Delete_Click(object sender, RoutedEventArgs e)
     {
         if ((sender as FrameworkElement)?.DataContext is not NoteViewModel note)
