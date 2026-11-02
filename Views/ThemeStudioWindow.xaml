@@ -160,7 +160,7 @@
                          Background="{DynamicResource AppSurfaceBrush}"
                          Foreground="{DynamicResource AppTextBrush}"
                          BorderBrush="{DynamicResource AppBorderBrush}"
-                         ToolTip="Hex color, e.g. #FFFFFFF2"
+                         ToolTip="Hex color, e.g. #FFFFFFFF"
                          AutomationProperties.Name="Hex color value"/>
             </Grid>
 
