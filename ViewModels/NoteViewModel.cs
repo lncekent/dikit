@@ -33,7 +33,6 @@ public sealed class NoteViewModel : ObservableObject
         _themes = themes;
 
         CloseCommand = new RelayCommand(() => HideRequested?.Invoke(this));
-        TogglePinCommand = new RelayCommand(() => IsTopMost = !IsTopMost);
         DuplicateCommand = new RelayCommand(() => DuplicateRequested?.Invoke(this));
         DeleteCommand = new RelayCommand(() => DeleteRequested?.Invoke(this));
         ThemeStudioCommand = new RelayCommand(() => ThemeStudioRequested?.Invoke(this));
@@ -87,10 +86,14 @@ public sealed class NoteViewModel : ObservableObject
 
     public ObservableCollection<ContentBlock> Blocks => _note.Blocks;
 
-    public bool IsTopMost
+    public bool IsStuck
     {
-        get => _note.Window.AlwaysOnTop;
-        set => _note.Window.AlwaysOnTop = value;
+        get => _note.Window.IsStuck || _note.Window.AlwaysOnTop;
+        set
+        {
+            _note.Window.IsStuck = value;
+            _note.Window.AlwaysOnTop = false;
+        }
     }
 
     public bool IsOpen => _note.Window.IsOpen;
@@ -103,8 +106,6 @@ public sealed class NoteViewModel : ObservableObject
         _note.ThemeOverride ?? _themes.Resolve(_note.ThemeId ?? _settings.GlobalThemeId);
 
     public RelayCommand CloseCommand { get; }
-
-    public RelayCommand TogglePinCommand { get; }
 
     public RelayCommand DuplicateCommand { get; }
 
@@ -256,9 +257,10 @@ public sealed class NoteViewModel : ObservableObject
         }
         else if (sender is WindowPlacement)
         {
-            if (e.PropertyName == nameof(WindowPlacement.AlwaysOnTop))
+            if (e.PropertyName == nameof(WindowPlacement.IsStuck)
+                || e.PropertyName == nameof(WindowPlacement.AlwaysOnTop))
             {
-                OnPropertyChanged(nameof(IsTopMost));
+                OnPropertyChanged(nameof(IsStuck));
             }
             else if (e.PropertyName == nameof(WindowPlacement.IsOpen))
             {
