@@ -13,7 +13,7 @@
 | M3: Theme Studio | Presets, live preview, and per-note customization | Implemented and Windows smoke-tested |
 | M4: Desktop integration and release | Tray controls, opt-in startup, recovery, and Windows distribution | Integration implemented and Windows smoke-tested; packaging planned |
 
-## Implemented on `main` (M1)
+## Implemented (M1)
 
 - MVVM layout: `Models/`, `ViewModels/`, `Views/`, `Services/`, `Infrastructure/`; custom `ObservableObject` and `RelayCommand` (no external MVVM package).
 - Schema-versioned `Note` model (`schemaVersion: 1`) with typed `ContentBlock` hierarchy (`text`, `image`, `link`, `checklist`), `WindowPlacement`, `NoteTheme`, `AppSettings`, and `NoteManifest`.
@@ -22,9 +22,9 @@
 - Text editing with debounced (~400 ms) autosave; title editing; create, duplicate, delete (with confirmation and a recoverable copy), close-as-hide, and a persistent Stick toggle.
 - Window geometry captured and restored with off-screen clamping to the virtual screen; open state persists so notes reopen on next launch. `isStuck` prevents title-bar moving while retaining normal window activation and resize behavior.
 - `MainWindow` acts only as a host/launcher: note list with open status, New note, Restore all, Hide all, Theme studio, Quit, and recovery notices.
-- Classic Light and Classic Dark built-in themes are defined and resolved per note; per-note `themeOverride` and global `globalThemeId` are persisted.
+- Classic Light and Classic Dark built-in themes are defined and resolved per note; retired built-in IDs still resolve for existing persisted references but are not selectable. Per-note `themeOverride` and global `globalThemeId` are persisted.
 
-## Implemented on `main` (M2)
+## Implemented (M2)
 
 - Per-note block toolbar (`+ Text`, `+ Checklist`, `+ Link`, `+ Image`) appends typed blocks; every block can be removed via a focusable per-block remove button or its right-click "Remove block" menu.
 - `Ctrl+V` inside a note saves a clipboard bitmap as a PNG under `notes/<id>/assets/` (downscaled past 2048 px on the longest edge, capped at 15 MB) and appends an image block; pasting a lone `http`/`https` URL outside a text field creates a link block.
@@ -32,14 +32,14 @@
 - Link blocks expose editable label and URL fields plus an "Open ↗" action that is enabled only for `http`/`https` URIs and launches the default browser via `LinkLauncher`; other schemes are never executed.
 - Checklist blocks persist `checked` state and render completed items struck through.
 
-## Implemented on `main` (M3)
+## Implemented (M3)
 
 - `ThemeStudioWindow` (note's "Theme" button for per-note scope, launcher's "Theme…" for global): preset swatch cards, background/text/accent editing via hex field plus a shared swatch palette, font picker, corner-radius and opacity sliders, and a live preview card.
 - "Apply to this note" stores the working theme as the note's `themeOverride` and updates the window live; "Inherit global" clears the override so the note follows the global theme again.
 - "Apply to all notes" reuses a matching preset or persists a `user-*` theme JSON under `themes/` and sets `globalThemeId`; "Save as preset" writes a reusable theme file without changing scope, and the × on a custom preset deletes its file and falls back to Classic Light where needed.
 - Custom theme fonts resolve with a `Segoe UI` fallback when the named family is unavailable.
 
-## Implemented on `main` (M4 — desktop integration)
+## Implemented (M4 — desktop integration)
 
 - `TrayIconService` hosts a system-tray icon (embedded `Resources/dikit.ico`, also the application icon) with a menu: New note, All notes, Hide all, Restore all, Settings, Quit. Left-click opens All notes. Uses the Windows Forms `NotifyIcon` via `UseWindowsForms` — no third-party packages.
 - `ShutdownMode="OnExplicitShutdown"` plus `MainWindow.OnClosing` → hide: closing the All notes window or any note never quits; only the tray/window Quit exits. `NotesManagerViewModel.IsShuttingDown` lets real shutdowns through.
