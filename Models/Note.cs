@@ -13,7 +13,6 @@ public sealed class Note : ObservableObject
     private string _title = string.Empty;
     private string? _themeId;
     private NoteTheme? _themeOverride;
-    private bool _titleBarFollowsApp = true;
     private ObservableCollection<ContentBlock> _blocks = new ObservableCollection<ContentBlock>();
     private WindowPlacement _window = new WindowPlacement();
     private DateTimeOffset _createdUtc = DateTimeOffset.UtcNow;
@@ -52,13 +51,6 @@ public sealed class Note : ObservableObject
     {
         get => _themeOverride;
         set => SetProperty(ref _themeOverride, value);
-    }
-
-    [JsonPropertyName("titleBarFollowsApp")]
-    public bool TitleBarFollowsApp
-    {
-        get => _titleBarFollowsApp;
-        set => SetProperty(ref _titleBarFollowsApp, value);
     }
 
     [JsonPropertyName("blocks")]

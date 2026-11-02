@@ -51,7 +51,7 @@
 - `WindowGeometry` verifies the restored title strip intersects an attached monitor's work area (per-monitor check via `Screen.AllScreens`, pixel→DIP scaled per screen via `GetDpiForMonitor` so mixed-DPI setups clamp correctly) and otherwise centers on the primary screen.
 - `WindowCoordinator` owns note/settings/theme-studio window lifecycles so `NotesManagerViewModel` holds state and intent only; a first-launch welcome note is created when no notes exist; deleting a note cancels its pending autosave first; active search results refresh when note titles or block content change.
 - Interactive controls across the windows expose `AutomationProperties.Name` for screen readers (title and block fields, remove buttons, swatches, search, settings fields).
-- Each note's ⋯ opens note settings: a "Note theme" submenu listing every preset with the active one checked, "Customize theme…" (per-note Theme Studio), "Title bar follows app theme" (persisted `titleBarFollowsApp`), Duplicate and Delete. With the toggle on (default) the note's title strip paints with the app's light/dark `AppSurface`/`AppText` brushes instead of the note theme's colors.
+- Each note's ⋯ opens note settings: a "Note theme" submenu listing every preset with the active one checked, "Customize theme…" (per-note Theme Studio), Duplicate and Delete. The note's title strip always paints with the note theme's colors, and the title field hugs its text so empty title-bar space stays draggable.
 - All notes cards open the note on click and offer the same Open/Duplicate/Delete menu from a ⋯ button or a right-click.
 
 ## Verification status
