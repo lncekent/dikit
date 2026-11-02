@@ -43,6 +43,13 @@ public sealed class NoteViewModel : ObservableObject
         DuplicateCommand = new RelayCommand(() => DuplicateRequested?.Invoke(this));
         DeleteCommand = new RelayCommand(() => DeleteRequested?.Invoke(this));
         ThemeStudioCommand = new RelayCommand(() => ThemeStudioRequested?.Invoke(this));
+        ApplyThemeCommand = new RelayCommand(parameter =>
+        {
+            if (parameter is NoteTheme theme)
+            {
+                ApplyTheme(theme);
+            }
+        });
         AddTextBlockCommand = new RelayCommand(() => _note.Blocks.Add(new TextBlock()));
         AddChecklistBlockCommand = new RelayCommand(() => _note.Blocks.Add(new ChecklistBlock()));
         AddLinkBlockCommand = new RelayCommand(() => _note.Blocks.Add(new LinkBlock()));
@@ -112,6 +119,23 @@ public sealed class NoteViewModel : ObservableObject
     public NoteTheme Theme =>
         _note.ThemeOverride ?? _themes.Resolve(_note.ThemeId ?? _settings.GlobalThemeId);
 
+    public IReadOnlyList<NoteTheme> AvailableThemes => _themes.All;
+
+    public string? CurrentThemeId =>
+        _note.ThemeOverride?.Id ?? _note.ThemeId ?? _settings.GlobalThemeId;
+
+    public bool TitleBarFollowsApp
+    {
+        get => _note.TitleBarFollowsApp;
+        set => _note.TitleBarFollowsApp = value;
+    }
+
+    public void RefreshThemeOptions()
+    {
+        OnPropertyChanged(nameof(AvailableThemes));
+        OnPropertyChanged(nameof(CurrentThemeId));
+    }
+
     public RelayCommand CloseCommand { get; }
 
     public RelayCommand DuplicateCommand { get; }
@@ -119,6 +143,8 @@ public sealed class NoteViewModel : ObservableObject
     public RelayCommand DeleteCommand { get; }
 
     public RelayCommand ThemeStudioCommand { get; }
+
+    public RelayCommand ApplyThemeCommand { get; }
 
     public RelayCommand AddTextBlockCommand { get; }
 
@@ -167,6 +193,7 @@ public sealed class NoteViewModel : ObservableObject
     public void ApplyTheme(NoteTheme theme)
     {
         _note.ThemeOverride = theme.Clone();
+        OnPropertyChanged(nameof(CurrentThemeId));
     }
 
     public void ClearThemeOverride()
@@ -296,6 +323,11 @@ public sealed class NoteViewModel : ObservableObject
                 }
 
                 OnPropertyChanged(nameof(Theme));
+                OnPropertyChanged(nameof(CurrentThemeId));
+            }
+            else if (e.PropertyName == nameof(Note.TitleBarFollowsApp))
+            {
+                OnPropertyChanged(nameof(TitleBarFollowsApp));
             }
         }
 

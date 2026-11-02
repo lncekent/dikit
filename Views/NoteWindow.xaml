@@ -33,15 +33,27 @@
 
             <Grid x:Name="TitleBar"
                   Margin="6,6,6,0"
-                  Background="Transparent"
                   MouseLeftButtonDown="TitleBar_MouseLeftButtonDown">
+                <Grid.Style>
+                    <Style TargetType="Grid">
+                        <Setter Property="Background" Value="Transparent"/>
+                        <Setter Property="TextElement.Foreground"
+                                Value="{Binding Theme.Foreground, Converter={StaticResource HexToBrush}}"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding TitleBarFollowsApp}" Value="True">
+                                <Setter Property="Background" Value="{DynamicResource AppSurfaceBrush}"/>
+                                <Setter Property="TextElement.Foreground" Value="{DynamicResource AppTextBrush}"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Grid.Style>
                 <TextBox Text="{Binding Title, UpdateSourceTrigger=PropertyChanged}"
                          Margin="8,2,175,2"
                          Padding="0,2"
                          BorderThickness="0"
                          Background="Transparent"
-                         Foreground="{Binding Theme.Foreground, Converter={StaticResource HexToBrush}}"
-                         CaretBrush="{Binding Theme.Foreground, Converter={StaticResource HexToBrush}}"
+                         Foreground="{Binding Path=(TextElement.Foreground), RelativeSource={RelativeSource AncestorType={x:Type Grid}}}"
+                         CaretBrush="{Binding Path=(TextElement.Foreground), RelativeSource={RelativeSource AncestorType={x:Type Grid}}}"
                          FontWeight="SemiBold"
                          FontSize="13"
                          TextWrapping="NoWrap"
@@ -50,30 +62,53 @@
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
                     <ToggleButton Style="{StaticResource AppToggle}"
                                   IsChecked="{Binding IsStuck, Mode=TwoWay}"
-                                  Foreground="{Binding Theme.Foreground, Converter={StaticResource HexToBrush}}"
+                                  Foreground="{Binding Path=(TextElement.Foreground), RelativeSource={RelativeSource AncestorType={x:Type Grid}}}"
                                   ToolTip="Stick this note in place"
                                   AutomationProperties.Name="Stick note in place"
                                   Content="Stick"/>
                     <Button Style="{StaticResource ChromeButton}"
-                            Command="{Binding ThemeStudioCommand}"
-                            Foreground="{Binding Theme.Foreground, Converter={StaticResource HexToBrush}}"
-                            ToolTip="Theme"
-                            Content="Theme"/>
-                    <Button Style="{StaticResource ChromeButton}"
                             Click="Minimize_Click"
-                            Foreground="{Binding Theme.Foreground, Converter={StaticResource HexToBrush}}"
+                            Foreground="{Binding Path=(TextElement.Foreground), RelativeSource={RelativeSource AncestorType={x:Type Grid}}}"
                             ToolTip="Minimize"
                             AutomationProperties.Name="Minimize note"
                             Content="–"/>
                     <Button x:Name="MenuButton"
                             Style="{StaticResource ChromeButton}"
                             Click="MenuButton_Click"
-                            Foreground="{Binding Theme.Foreground, Converter={StaticResource HexToBrush}}"
-                            ToolTip="Note actions"
-                            AutomationProperties.Name="Note actions"
+                            Foreground="{Binding Path=(TextElement.Foreground), RelativeSource={RelativeSource AncestorType={x:Type Grid}}}"
+                            ToolTip="Note settings"
+                            AutomationProperties.Name="Note settings"
                             Content="⋯">
                         <Button.ContextMenu>
                             <ContextMenu DataContext="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">
+                                <MenuItem Header="Note theme" ItemsSource="{Binding AvailableThemes}">
+                                    <MenuItem.ItemTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding Name}"/>
+                                        </DataTemplate>
+                                    </MenuItem.ItemTemplate>
+                                    <MenuItem.ItemContainerStyle>
+                                        <Style TargetType="MenuItem">
+                                            <Setter Property="IsCheckable" Value="True"/>
+                                            <Setter Property="Command"
+                                                    Value="{Binding DataContext.ApplyThemeCommand, RelativeSource={RelativeSource AncestorType={x:Type ContextMenu}}}"/>
+                                            <Setter Property="CommandParameter" Value="{Binding}"/>
+                                            <Setter Property="IsChecked">
+                                                <Setter.Value>
+                                                    <MultiBinding Converter="{StaticResource ThemeIdMatch}">
+                                                        <Binding Path="Id"/>
+                                                        <Binding Path="DataContext.CurrentThemeId" RelativeSource="{RelativeSource AncestorType={x:Type ContextMenu}}"/>
+                                                    </MultiBinding>
+                                                </Setter.Value>
+                                            </Setter>
+                                        </Style>
+                                    </MenuItem.ItemContainerStyle>
+                                </MenuItem>
+                                <MenuItem Header="Customize theme…" Command="{Binding ThemeStudioCommand}"/>
+                                <MenuItem Header="Title bar follows app theme"
+                                          IsCheckable="True"
+                                          IsChecked="{Binding TitleBarFollowsApp, Mode=TwoWay}"/>
+                                <Separator/>
                                 <MenuItem Header="Duplicate" Command="{Binding DuplicateCommand}"/>
                                 <MenuItem Header="Delete note…" Click="DeleteMenuItem_Click"/>
                             </ContextMenu>
@@ -81,7 +116,7 @@
                     </Button>
                     <Button Style="{StaticResource ChromeButton}"
                             Command="{Binding CloseCommand}"
-                            Foreground="{Binding Theme.Foreground, Converter={StaticResource HexToBrush}}"
+                            Foreground="{Binding Path=(TextElement.Foreground), RelativeSource={RelativeSource AncestorType={x:Type Grid}}}"
                             ToolTip="Close (note stays saved)"
                             AutomationProperties.Name="Close note"
                             Content="×"/>

@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using System.Windows;
+using System.Windows.Input;
 using dikit.ViewModels;
 
 namespace dikit;
@@ -31,9 +32,29 @@ public partial class MainWindow : Window
         }
     }
 
+    private void NoteCard_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+    {
+        if ((sender as FrameworkElement)?.DataContext is NoteViewModel note
+            && DataContext is NotesManagerViewModel manager)
+        {
+            manager.OpenNote(note);
+        }
+    }
+
+    private void NoteCardMenu_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is System.Windows.Controls.Button button && button.ContextMenu is { } menu)
+        {
+            menu.PlacementTarget = button;
+            menu.IsOpen = true;
+        }
+    }
+
     private void Delete_Click(object sender, RoutedEventArgs e)
     {
-        if ((sender as FrameworkElement)?.DataContext is not NoteViewModel note)
+        NoteViewModel? note = (sender as System.Windows.Controls.MenuItem)?.CommandParameter as NoteViewModel
+            ?? (sender as FrameworkElement)?.DataContext as NoteViewModel;
+        if (note is null)
         {
             return;
         }

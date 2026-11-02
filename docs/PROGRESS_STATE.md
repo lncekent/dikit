@@ -34,7 +34,7 @@
 
 ## Implemented (M3)
 
-- `ThemeStudioWindow` (note's "Theme" button for per-note scope, launcher's "Theme…" for global): preset swatch cards, background/text/accent editing via hex field plus a shared swatch palette, font picker, corner-radius and opacity sliders, and a live preview card.
+- `ThemeStudioWindow` (note's ⋯ → "Customize theme…" for per-note scope, launcher's "Theme…" for global): preset swatch cards, background/text/accent editing via hex field plus a shared swatch palette, font picker, corner-radius and opacity sliders, and a live preview card.
 - "Apply to this note" stores the working theme as the note's `themeOverride` and updates the window live; "Inherit global" clears the override so the note follows the global theme again.
 - "Apply to all notes" reuses a matching preset or persists a `user-*` theme JSON under `themes/` and sets `globalThemeId`; "Save as preset" writes a reusable theme file without changing scope, and the × on a custom preset deletes its file and falls back to Classic Light where needed.
 - Custom theme fonts resolve with a `Segoe UI` fallback when the named family is unavailable.
@@ -51,6 +51,8 @@
 - `WindowGeometry` verifies the restored title strip intersects an attached monitor's work area (per-monitor check via `Screen.AllScreens`, pixel→DIP scaled per screen via `GetDpiForMonitor` so mixed-DPI setups clamp correctly) and otherwise centers on the primary screen.
 - `WindowCoordinator` owns note/settings/theme-studio window lifecycles so `NotesManagerViewModel` holds state and intent only; a first-launch welcome note is created when no notes exist; deleting a note cancels its pending autosave first; active search results refresh when note titles or block content change.
 - Interactive controls across the windows expose `AutomationProperties.Name` for screen readers (title and block fields, remove buttons, swatches, search, settings fields).
+- Each note's ⋯ opens note settings: a "Note theme" submenu listing every preset with the active one checked, "Customize theme…" (per-note Theme Studio), "Title bar follows app theme" (persisted `titleBarFollowsApp`), Duplicate and Delete. With the toggle on (default) the note's title strip paints with the app's light/dark `AppSurface`/`AppText` brushes instead of the note theme's colors.
+- All notes cards open the note on click and offer the same Open/Duplicate/Delete menu from a ⋯ button or a right-click.
 
 ## Verification status
 

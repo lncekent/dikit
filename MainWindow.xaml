@@ -131,7 +131,23 @@
                                     CornerRadius="10"
                                     Background="{DynamicResource AppSurfaceBrush}"
                                     BorderBrush="{DynamicResource AppBorderBrush}"
-                                    BorderThickness="1">
+                                    BorderThickness="1"
+                                    Cursor="Hand"
+                                    Tag="{Binding DataContext, RelativeSource={RelativeSource AncestorType={x:Type Window}}}"
+                                    MouseLeftButtonDown="NoteCard_MouseLeftButtonDown">
+                                <Border.ContextMenu>
+                                    <ContextMenu>
+                                        <MenuItem Header="Open"
+                                                  Command="{Binding PlacementTarget.Tag.OpenNoteCommand, RelativeSource={RelativeSource AncestorType={x:Type ContextMenu}}}"
+                                                  CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType={x:Type ContextMenu}}}"/>
+                                        <MenuItem Header="Duplicate"
+                                                  Command="{Binding PlacementTarget.Tag.DuplicateNoteCommand, RelativeSource={RelativeSource AncestorType={x:Type ContextMenu}}}"
+                                                  CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType={x:Type ContextMenu}}}"/>
+                                        <MenuItem Header="Delete note…"
+                                                  Click="Delete_Click"
+                                                  CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType={x:Type ContextMenu}}}"/>
+                                    </ContextMenu>
+                                </Border.ContextMenu>
                                 <Grid>
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="*"/>
@@ -151,24 +167,29 @@
                                             <Run Text="{Binding UpdatedText, Mode=OneWay}"/>
                                         </TextBlock>
                                     </StackPanel>
-                                    <StackPanel Grid.Column="1"
-                                                Orientation="Horizontal"
-                                                VerticalAlignment="Center">
-                                        <Button Style="{StaticResource ChromeButton}"
-                                                Command="{Binding DataContext.OpenNoteCommand, RelativeSource={RelativeSource AncestorType={x:Type Window}}}"
-                                                CommandParameter="{Binding}"
-                                                Content="Open"/>
-                                        <Button Style="{StaticResource ChromeButton}"
-                                                Command="{Binding DataContext.DuplicateNoteCommand, RelativeSource={RelativeSource AncestorType={x:Type Window}}}"
-                                                CommandParameter="{Binding}"
-                                                Foreground="{DynamicResource AppMutedTextBrush}"
-                                                Content="Duplicate"/>
-                                        <Button Style="{StaticResource ChromeButton}"
-                                                Click="Delete_Click"
-                                                Foreground="{DynamicResource AppDangerBrush}"
-                                                AutomationProperties.Name="{Binding Title, StringFormat='Delete note {0}'}"
-                                                Content="Delete"/>
-                                    </StackPanel>
+                                    <Button Grid.Column="1"
+                                            Style="{StaticResource ChromeButton}"
+                                            Click="NoteCardMenu_Click"
+                                            Foreground="{DynamicResource AppMutedTextBrush}"
+                                            VerticalAlignment="Center"
+                                            ToolTip="Note options"
+                                            AutomationProperties.Name="{Binding Title, StringFormat='Options for note {0}'}"
+                                            Tag="{Binding DataContext, RelativeSource={RelativeSource AncestorType={x:Type Window}}}"
+                                            Content="⋯">
+                                        <Button.ContextMenu>
+                                            <ContextMenu>
+                                                <MenuItem Header="Open"
+                                                          Command="{Binding PlacementTarget.Tag.OpenNoteCommand, RelativeSource={RelativeSource AncestorType={x:Type ContextMenu}}}"
+                                                          CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType={x:Type ContextMenu}}}"/>
+                                                <MenuItem Header="Duplicate"
+                                                          Command="{Binding PlacementTarget.Tag.DuplicateNoteCommand, RelativeSource={RelativeSource AncestorType={x:Type ContextMenu}}}"
+                                                          CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType={x:Type ContextMenu}}}"/>
+                                                <MenuItem Header="Delete note…"
+                                                          Click="Delete_Click"
+                                                          CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType={x:Type ContextMenu}}}"/>
+                                            </ContextMenu>
+                                        </Button.ContextMenu>
+                                    </Button>
                                 </Grid>
                             </Border>
                         </DataTemplate>
