@@ -39,16 +39,12 @@
                         <Setter Property="Background" Value="Transparent"/>
                         <Setter Property="TextElement.Foreground"
                                 Value="{Binding Theme.Foreground, Converter={StaticResource HexToBrush}}"/>
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding TitleBarFollowsApp}" Value="True">
-                                <Setter Property="Background" Value="{DynamicResource AppSurfaceBrush}"/>
-                                <Setter Property="TextElement.Foreground" Value="{DynamicResource AppTextBrush}"/>
-                            </DataTrigger>
-                        </Style.Triggers>
                     </Style>
                 </Grid.Style>
                 <TextBox Text="{Binding Title, UpdateSourceTrigger=PropertyChanged}"
                          Margin="8,2,175,2"
+                         HorizontalAlignment="Left"
+                         MinWidth="60"
                          Padding="0,2"
                          BorderThickness="0"
                          Background="Transparent"
@@ -105,9 +101,6 @@
                                     </MenuItem.ItemContainerStyle>
                                 </MenuItem>
                                 <MenuItem Header="Customize theme…" Command="{Binding ThemeStudioCommand}"/>
-                                <MenuItem Header="Title bar follows app theme"
-                                          IsCheckable="True"
-                                          IsChecked="{Binding TitleBarFollowsApp, Mode=TwoWay}"/>
                                 <Separator/>
                                 <MenuItem Header="Duplicate" Command="{Binding DuplicateCommand}"/>
                                 <MenuItem Header="Delete note…" Click="DeleteMenuItem_Click"/>

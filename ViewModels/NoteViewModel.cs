@@ -124,12 +124,6 @@ public sealed class NoteViewModel : ObservableObject
     public string? CurrentThemeId =>
         _note.ThemeOverride?.Id ?? _note.ThemeId ?? _settings.GlobalThemeId;
 
-    public bool TitleBarFollowsApp
-    {
-        get => _note.TitleBarFollowsApp;
-        set => _note.TitleBarFollowsApp = value;
-    }
-
     public void RefreshThemeOptions()
     {
         OnPropertyChanged(nameof(AvailableThemes));
@@ -324,10 +318,6 @@ public sealed class NoteViewModel : ObservableObject
 
                 OnPropertyChanged(nameof(Theme));
                 OnPropertyChanged(nameof(CurrentThemeId));
-            }
-            else if (e.PropertyName == nameof(Note.TitleBarFollowsApp))
-            {
-                OnPropertyChanged(nameof(TitleBarFollowsApp));
             }
         }
 
