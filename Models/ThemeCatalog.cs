@@ -10,7 +10,7 @@ public static class ThemeCatalog
         {
             Id = "classic",
             Name = "Classic Light",
-            Background = "#FFFFFFF2",
+            Background = "#FFFFFFFF",
             Foreground = "#1C1C1E",
             Accent = "#0A84FF",
             FontFamily = "Inter",
@@ -22,7 +22,7 @@ public static class ThemeCatalog
         {
             Id = "classic-dark",
             Name = "Classic Dark",
-            Background = "#1C1C1EF2",
+            Background = "#FF1C1C1E",
             Foreground = "#F2F2F7",
             Accent = "#0A84FF",
             FontFamily = "Inter",

@@ -99,8 +99,8 @@ public sealed class ThemeStudioViewModel : ObservableObject
 
     public IReadOnlyList<string> Palette { get; } = new List<string>
     {
-        "#FFFFFFF2", "#F2F2F7", "#E5E5EA", "#E8F4FD", "#FDEFF3", "#F1F7E8",
-        "#1C1C1EF2", "#2C2C2E", "#3A3A3C", "#FFFFFF",
+        "#FFFFFFFF", "#FFF2F2F7", "#FFE5E5EA", "#FFE8F4FD", "#FFFDEFF3", "#FFF1F7E8",
+        "#FF1C1C1E", "#FF2C2C2E", "#FF3A3A3C", "#FFFFFFFF",
         "#0A84FF", "#FF375F", "#BF5AF2", "#30D158", "#64D2FF", "#98989D",
     };
 
