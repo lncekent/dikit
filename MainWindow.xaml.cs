@@ -24,11 +24,17 @@ public partial class MainWindow : Window
         base.OnClosing(e);
     }
 
-    private void ThemeStudio_Click(object sender, RoutedEventArgs e)
+    private void SettingsMenu_Click(object sender, RoutedEventArgs e)
     {
-        if (DataContext is NotesManagerViewModel manager)
+        if (sender is System.Windows.Controls.Button button && button.ContextMenu is { } menu)
         {
-            manager.OpenThemeStudio(null);
+            if (DataContext is NotesManagerViewModel manager)
+            {
+                manager.RefreshThemeOptions();
+            }
+
+            menu.PlacementTarget = button;
+            menu.IsOpen = true;
         }
     }
 

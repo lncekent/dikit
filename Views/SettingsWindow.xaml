@@ -3,83 +3,110 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Dikit settings"
         Width="420"
-        SizeToContent="Height"
-        ResizeMode="NoResize"
+        Height="480"
+        MinHeight="300"
+        ResizeMode="CanResizeWithGrip"
         WindowStartupLocation="CenterOwner"
         FontFamily="{StaticResource AppFont}"
         Background="{DynamicResource AppBackgroundBrush}"
         Icon="pack://application:,,,/Resources/dikit.ico">
 
-    <Grid Margin="20">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="20">
+            <TextBlock Text="Settings" FontSize="18" FontWeight="SemiBold"
+                       Foreground="{DynamicResource AppTextBrush}"/>
 
-        <TextBlock Text="Settings" FontSize="18" FontWeight="SemiBold"
-                   Foreground="{DynamicResource AppTextBrush}"/>
-
-        <CheckBox Grid.Row="1"
-                  Content="Use dark appearance"
-                  IsChecked="{Binding IsDarkAppearance, Mode=TwoWay}"
-                  FontSize="13"
-                  Foreground="{DynamicResource AppTextBrush}"
-                  Margin="0,14,0,0"
-                  VerticalContentAlignment="Center"
-                  AutomationProperties.Name="Dark appearance"/>
-
-        <CheckBox Grid.Row="2"
-                  Content="Launch Dikit when Windows signs in"
-                  IsChecked="{Binding LaunchAtSignIn, Mode=TwoWay}"
-                  FontSize="13"
-                  Foreground="{DynamicResource AppTextBrush}"
-                  Margin="0,8,0,0"
-                  VerticalContentAlignment="Center"/>
-
-        <StackPanel Grid.Row="3" Orientation="Horizontal" Margin="0,12,0,0">
-            <TextBlock Text="Backups kept per note"
-                       FontSize="12"
+            <TextBlock Text="Appearance"
+                       FontSize="12" FontWeight="SemiBold"
                        Foreground="{DynamicResource AppMutedTextBrush}"
-                       VerticalAlignment="Center"/>
-            <TextBox Text="{Binding BackupRetention, UpdateSourceTrigger=PropertyChanged, Delay=400}"
-                     Width="48"
-                     Margin="8,0,0,0"
-                     Padding="4,2"
-                     FontSize="12"
-                     HorizontalContentAlignment="Center"
-                     Background="{DynamicResource AppSurfaceBrush}"
-                     Foreground="{DynamicResource AppTextBrush}"
-                     CaretBrush="{DynamicResource AppTextBrush}"
-                     BorderBrush="{DynamicResource AppBorderBrush}"
-                     AutomationProperties.Name="Backups kept per note"/>
-        </StackPanel>
+                       Margin="0,16,0,0"/>
+            <CheckBox Content="Use dark appearance"
+                      IsChecked="{Binding IsDarkAppearance, Mode=TwoWay}"
+                      FontSize="13"
+                      Foreground="{DynamicResource AppTextBrush}"
+                      Margin="0,8,0,0"
+                      VerticalContentAlignment="Center"
+                      AutomationProperties.Name="Dark appearance"/>
 
-        <StackPanel Grid.Row="4" Margin="0,14,0,0">
-            <TextBlock Text="Data folder" FontSize="12"
-                       Foreground="{DynamicResource AppMutedTextBrush}"/>
-            <TextBlock Text="{Binding DataFolderPath}"
+            <TextBlock Text="Note theme"
+                       FontSize="12" FontWeight="SemiBold"
+                       Foreground="{DynamicResource AppMutedTextBrush}"
+                       Margin="0,16,0,0"/>
+            <TextBlock Text="Default theme for notes"
                        FontSize="11"
-                       Foreground="{DynamicResource AppTextBrush}"
-                       Margin="0,2,0,0"
-                       TextWrapping="Wrap"/>
+                       Foreground="{DynamicResource AppMutedTextBrush}"
+                       Margin="0,4,0,0"/>
+            <ComboBox ItemsSource="{Binding AvailableThemes}"
+                      SelectedValuePath="Id"
+                      SelectedValue="{Binding GlobalThemeId, Mode=TwoWay}"
+                      DisplayMemberPath="Name"
+                      HorizontalAlignment="Left"
+                      MinWidth="200"
+                      Margin="0,6,0,0"
+                      AutomationProperties.Name="Default note theme"/>
             <Button Style="{StaticResource ChromeButton}"
-                    Click="OpenDataFolder_Click"
+                    Command="{Binding OpenGlobalThemeStudioCommand}"
                     FontWeight="SemiBold"
                     HorizontalAlignment="Left"
-                    Margin="-8,6,0,0"
-                    ToolTip="Open in File Explorer"
-                    Content="Open data folder"/>
-        </StackPanel>
+                    Margin="0,8,0,0"
+                    ToolTip="Edit or create theme presets"
+                    Content="Customize theme…"/>
 
-        <TextBlock Grid.Row="5"
-                   Text="Closing windows keeps Dikit in the system tray. Use Quit to exit."
-                   FontSize="11"
-                   Foreground="{DynamicResource AppMutedTextBrush}"
-                   Margin="0,16,0,0"
-                   TextWrapping="Wrap"/>
-    </Grid>
+            <TextBlock Text="Startup"
+                       FontSize="12" FontWeight="SemiBold"
+                       Foreground="{DynamicResource AppMutedTextBrush}"
+                       Margin="0,16,0,0"/>
+            <CheckBox Content="Launch Dikit when Windows signs in"
+                      IsChecked="{Binding LaunchAtSignIn, Mode=TwoWay}"
+                      FontSize="13"
+                      Foreground="{DynamicResource AppTextBrush}"
+                      Margin="0,8,0,0"
+                      VerticalContentAlignment="Center"/>
+
+            <TextBlock Text="Storage"
+                       FontSize="12" FontWeight="SemiBold"
+                       Foreground="{DynamicResource AppMutedTextBrush}"
+                       Margin="0,16,0,0"/>
+            <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                <TextBlock Text="Backups kept per note"
+                           FontSize="12"
+                           Foreground="{DynamicResource AppMutedTextBrush}"
+                           VerticalAlignment="Center"/>
+                <TextBox Text="{Binding BackupRetention, UpdateSourceTrigger=PropertyChanged, Delay=400}"
+                         Width="48"
+                         Margin="8,0,0,0"
+                         Padding="4,2"
+                         FontSize="12"
+                         HorizontalContentAlignment="Center"
+                         Background="{DynamicResource AppSurfaceBrush}"
+                         Foreground="{DynamicResource AppTextBrush}"
+                         CaretBrush="{DynamicResource AppTextBrush}"
+                         BorderBrush="{DynamicResource AppBorderBrush}"
+                         AutomationProperties.Name="Backups kept per note"/>
+            </StackPanel>
+
+            <StackPanel Margin="0,14,0,0">
+                <TextBlock Text="Data folder" FontSize="12"
+                           Foreground="{DynamicResource AppMutedTextBrush}"/>
+                <TextBlock Text="{Binding DataFolderPath}"
+                           FontSize="11"
+                           Foreground="{DynamicResource AppTextBrush}"
+                           Margin="0,2,0,0"
+                           TextWrapping="Wrap"/>
+                <Button Style="{StaticResource ChromeButton}"
+                        Click="OpenDataFolder_Click"
+                        FontWeight="SemiBold"
+                        HorizontalAlignment="Left"
+                        Margin="-8,6,0,0"
+                        ToolTip="Open in File Explorer"
+                        Content="Open data folder"/>
+            </StackPanel>
+
+            <TextBlock Text="Closing windows keeps Dikit in the system tray. Use Quit to exit."
+                       FontSize="11"
+                       Foreground="{DynamicResource AppMutedTextBrush}"
+                       Margin="0,16,0,0"
+                       TextWrapping="Wrap"/>
+        </StackPanel>
+    </ScrollViewer>
 </Window>

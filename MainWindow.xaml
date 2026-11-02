@@ -32,14 +32,48 @@
                            Foreground="{DynamicResource AppMutedTextBrush}"
                            Margin="0,2,0,0"/>
             </StackPanel>
-            <ToggleButton Style="{StaticResource AppToggle}"
-                          IsChecked="{Binding IsDarkAppearance, Mode=TwoWay}"
-                          HorizontalAlignment="Right"
-                          VerticalAlignment="Top"
-                          Content="Dark"
-                          ToolTip="Use dark app colors"
-                          AutomationProperties.Name="Dark mode"
-                          Foreground="{DynamicResource AppTextBrush}"/>
+            <Button Style="{StaticResource ChromeButton}"
+                    Click="SettingsMenu_Click"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Top"
+                    Foreground="{DynamicResource AppMutedTextBrush}"
+                    ToolTip="Settings"
+                    AutomationProperties.Name="Settings"
+                    Content="⋯">
+                <Button.ContextMenu>
+                    <ContextMenu DataContext="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">
+                        <MenuItem Header="Default note theme" ItemsSource="{Binding AvailableThemes}">
+                            <MenuItem.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Name}"/>
+                                </DataTemplate>
+                            </MenuItem.ItemTemplate>
+                            <MenuItem.ItemContainerStyle>
+                                <Style TargetType="MenuItem">
+                                    <Setter Property="IsCheckable" Value="True"/>
+                                    <Setter Property="Command"
+                                            Value="{Binding DataContext.ApplyGlobalThemeCommand, RelativeSource={RelativeSource AncestorType={x:Type ContextMenu}}}"/>
+                                    <Setter Property="CommandParameter" Value="{Binding}"/>
+                                    <Setter Property="IsChecked">
+                                        <Setter.Value>
+                                            <MultiBinding Converter="{StaticResource ThemeIdMatch}" Mode="OneWay">
+                                                <Binding Path="Id"/>
+                                                <Binding Path="DataContext.GlobalThemeId" RelativeSource="{RelativeSource AncestorType={x:Type ContextMenu}}"/>
+                                            </MultiBinding>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </MenuItem.ItemContainerStyle>
+                        </MenuItem>
+                        <MenuItem Header="Customize theme…" Command="{Binding OpenGlobalThemeStudioCommand}"/>
+                        <MenuItem Header="Dark appearance"
+                                  IsCheckable="True"
+                                  IsChecked="{Binding IsDarkAppearance, Mode=TwoWay}"/>
+                        <Separator/>
+                        <MenuItem Header="All settings…" Command="{Binding OpenSettingsCommand}"/>
+                    </ContextMenu>
+                </Button.ContextMenu>
+            </Button>
         </Grid>
 
         <Border Grid.Row="1"
@@ -109,17 +143,6 @@
                         Foreground="{DynamicResource AppMutedTextBrush}"
                         Margin="6,0,0,0"
                         Content="Hide all"/>
-                <Button Style="{StaticResource ChromeButton}"
-                        Click="ThemeStudio_Click"
-                        Foreground="{DynamicResource AppMutedTextBrush}"
-                        Margin="6,0,0,0"
-                        ToolTip="Global theme"
-                        Content="Theme…"/>
-                <Button Style="{StaticResource ChromeButton}"
-                        Command="{Binding OpenSettingsCommand}"
-                        Foreground="{DynamicResource AppMutedTextBrush}"
-                        Margin="6,0,0,0"
-                        Content="Settings"/>
             </StackPanel>
 
             <ScrollViewer Grid.Row="1" Margin="0,10,0,0" VerticalScrollBarVisibility="Auto">
