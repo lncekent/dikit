@@ -179,6 +179,12 @@ dotnet run
 
 **Lesson learned:** For automated smoke tests that must isolate `%LOCALAPPDATA%\Dikit`, do not rely on the `LOCALAPPDATA` environment variable alone; verify the actual folder the app writes to before editing or deleting test data.
 
+### Issue D — markup-pass `Color` ambiguity with `UseWindowsForms`
+
+**Observed error (November 2, 2026):** `dotnet build` failed in the temporary WPF markup-pass project because `Color` and `ColorConverter` were ambiguous between `System.Drawing` and `System.Windows.Media` in `Services/AppearanceService.cs`.
+
+**Resolution used:** Fully qualify WPF types as `System.Windows.Media.Color` and `System.Windows.Media.ColorConverter`. The fix was verified on .NET 10.0.403 with zero warnings and errors.
+
 ## 7. Command reference
 
 | Command                                                 | Why we use it                                                               |
@@ -220,7 +226,7 @@ Keep the source code, `.csproj`, `.xaml`, `.cs`, documentation, and any intentio
 
 ## 10. Current status and next milestone
 
-**Completed:** .NET 10 SDK recognized; C# tooling initialized; Dikit WPF project successfully launched. On `main`, M1–M3 plus M4 desktop integration are implemented and passed a Windows smoke test on .NET 10.0.403: `dotnet restore`/`dotnet build` pass; notes create/edit/move/resize/minimize/hide/restore/duplicate/delete; text, pasted/imported images, links and checklists persist; Theme Studio, tray menu, All notes search, Settings, single-instance activation, launch-at-sign-in registration, corrupt-note backup recovery, forced-kill recovery, and restart persistence were exercised. The project enables `UseWindowsForms` for the tray icon using the shared Windows Desktop framework.
+**Completed:** .NET 10 SDK recognized; C# tooling initialized; Dikit WPF project successfully launched. M1–M3 plus M4 desktop integration are implemented and passed Windows verification on .NET 10.0.403: `dotnet restore`/`dotnet build` pass; notes create/edit/move/resize/minimize/hide/restore/duplicate/delete; text, pasted/imported images, links and checklists persist; Theme Studio, tray menu, All notes search, Settings, single-instance activation, launch-at-sign-in registration, corrupt-note backup recovery, forced-kill recovery, and restart persistence were exercised. The current branch also verified persisted light/dark appearance, Classic Light/Classic Dark built-ins with custom-preset deletion, and Stick position locking without Topmost. The project enables `UseWindowsForms` for the tray icon using the shared Windows Desktop framework.
 
 **Next:** Package only after the remaining release checks in `docs/PROGRESS_STATE.md`: standalone executable launch without IDE/network, a 10-note workload, no-backup quarantine recovery, monitor-detach clamping, Wi-Fi-disabled use, RAM/storage/startup measurement, and Windows packaging/distribution.
 
