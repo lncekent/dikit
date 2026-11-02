@@ -80,7 +80,17 @@ public partial class NoteWindow : Window
             return;
         }
 
-        WindowGeometry.Capture(this, _viewModel.Model.Window);
+        WindowPlacement placement = _viewModel.Model.Window;
+        if (_viewModel.IsStuck)
+        {
+            System.Windows.Rect bounds = RestoreBounds;
+            placement.Width = bounds.Width;
+            placement.Height = bounds.Height;
+            WindowGeometry.ApplyTo(this, placement);
+            return;
+        }
+
+        WindowGeometry.Capture(this, placement);
     }
 
     private void PasteClipboardImage()
@@ -104,7 +114,7 @@ public partial class NoteWindow : Window
 
     private void TitleBar_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
     {
-        if (e.LeftButton == MouseButtonState.Pressed)
+        if (e.LeftButton == MouseButtonState.Pressed && !_viewModel.IsStuck)
         {
             DragMove();
         }

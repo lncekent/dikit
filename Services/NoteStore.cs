@@ -146,7 +146,7 @@ public sealed class NoteStore
         {
             Text = "Drag the title area to move a note, drag its edges to resize, and use + Text / + Checklist / + Link / + Image below to add blocks. Ctrl+V pastes a screenshot or a link.",
         });
-        note.Blocks.Add(new ChecklistBlock { Text = "Try pinning this note or restyling it with the Theme button" });
+        note.Blocks.Add(new ChecklistBlock { Text = "Try sticking this note in place or restyling it with the Theme button" });
         note.Blocks.Add(new TextBlock
         {
             Text = "Every note lives under All notes in the main window or the Dikit tray icon. Settings offers the launch-at-sign-in option, and Quit lives in the tray menu — closing a note never deletes it.",

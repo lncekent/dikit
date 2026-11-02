@@ -10,6 +10,7 @@ public sealed class WindowPlacement : ObservableObject
     private double _width = 340;
     private double _height = 400;
     private bool _isOpen;
+    private bool _isStuck;
     private bool _alwaysOnTop;
 
     [JsonPropertyName("x")]
@@ -45,6 +46,13 @@ public sealed class WindowPlacement : ObservableObject
     {
         get => _isOpen;
         set => SetProperty(ref _isOpen, value);
+    }
+
+    [JsonPropertyName("isStuck")]
+    public bool IsStuck
+    {
+        get => _isStuck;
+        set => SetProperty(ref _isStuck, value);
     }
 
     [JsonPropertyName("alwaysOnTop")]
