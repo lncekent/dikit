@@ -21,7 +21,7 @@
 - Borderless movable/resizable/minimizable `NoteWindow` with iOS Notes-inspired styling (Inter bundled under `Resources/Fonts/` with Segoe UI fallback, rounded card, subtle border and shadow).
 - Text editing with debounced (~400 ms) autosave; title editing; create, duplicate, delete (with confirmation and a recoverable copy), close-as-hide, and a persistent Stick toggle.
 - Window geometry captured and restored with off-screen clamping to the virtual screen; open state persists so notes reopen on next launch. `isStuck` prevents title-bar moving while retaining normal window activation and resize behavior; legacy `alwaysOnTop` flags normalize to Stick on the next save.
-- `MainWindow` acts only as a host/launcher: note list with open status, New note, Restore all, Hide all, Theme studio, Quit, and recovery notices.
+- `MainWindow` acts only as a host/launcher: note list with open status, New note, Restore all, Hide all, Quit, and recovery notices. The header ⋯ opens the launcher settings menu: "Default note theme" submenu (every preset, global choice checked), "Customize theme…" (global Theme Studio), a dark-appearance toggle, and "All settings…".
 - Classic Light and Classic Dark built-in themes are defined and resolved per note; retired built-in IDs still resolve for existing persisted references but are not selectable. Per-note `themeOverride` and global `globalThemeId` are persisted.
 
 ## Implemented (M2)
@@ -34,7 +34,7 @@
 
 ## Implemented (M3)
 
-- `ThemeStudioWindow` (note's ⋯ → "Customize theme…" for per-note scope, launcher's "Theme…" for global): preset swatch cards, background/text/accent editing via hex field plus a shared swatch palette, font picker, corner-radius and opacity sliders, and a live preview card.
+- `ThemeStudioWindow` (note's ⋯ → "Customize theme…" for per-note scope, launcher ⋯ → "Customize theme…" for global): preset swatch cards, background/text/accent editing via hex field plus a shared swatch palette, font picker, corner-radius and opacity sliders, and a live preview card.
 - "Apply to this note" stores the working theme as the note's `themeOverride` and updates the window live; "Inherit global" clears the override so the note follows the global theme again.
 - "Apply to all notes" reuses a matching preset or persists a `user-*` theme JSON under `themes/` and sets `globalThemeId`; "Save as preset" writes a reusable theme file without changing scope, and the × on a custom preset deletes its file and falls back to Classic Light where needed.
 - Custom theme fonts resolve with a `Segoe UI` fallback when the named family is unavailable.
@@ -46,7 +46,7 @@
 - `SingleInstanceGuard`: named mutex `Local\Dikit.SingleInstance`; a second launch signals `Local\Dikit.ShowRequest` (retrying briefly until the running instance has created the event) and exits; the running instance shows/activates its All notes window. Fails open if the named objects cannot be created.
 - `StartupService`: opt-in `HKCU\Software\Microsoft\Windows\CurrentVersion\Run` value named `Dikit` (user-level, no admin, reversible). `SyncStartupOption` re-applies the stored preference at launch so a moved executable is re-registered.
 - All notes manager gained a search box filtering titles and text/link/caption block content via `NoteViewModel.MatchesSearch` over `NotesView`.
-- `SettingsWindow`: light/dark appearance, "launch at Windows sign-in" toggle, per-note backup retention (1–30), and data-folder display/open.
+- `SettingsWindow`: a scrollable page with sections for appearance (light/dark), default note theme (preset picker plus "Customize theme…"), launch at Windows sign-in, per-note backup retention (1–30), and data-folder display/open.
 - `ErrorLog`: appends timestamped errors to `logs/dikit.log`; `DispatcherUnhandledException` and note/settings save failures are logged without crashing the app.
 - `WindowGeometry` verifies the restored title strip intersects an attached monitor's work area (per-monitor check via `Screen.AllScreens`, pixel→DIP scaled per screen via `GetDpiForMonitor` so mixed-DPI setups clamp correctly) and otherwise centers on the primary screen.
 - `WindowCoordinator` owns note/settings/theme-studio window lifecycles so `NotesManagerViewModel` holds state and intent only; a first-launch welcome note is created when no notes exist; deleting a note cancels its pending autosave first; active search results refresh when note titles or block content change.

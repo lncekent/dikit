@@ -1,6 +1,7 @@
 # Generated .NET build files
 bin/
 obj/
+*_wpftmp*
 
 # Local Visual Studio files
 .vs/

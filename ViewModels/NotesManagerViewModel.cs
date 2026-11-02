@@ -83,6 +83,15 @@ public sealed class NotesManagerViewModel : ObservableObject
         HideAllCommand = new RelayCommand(HideAll);
         RestoreAllCommand = new RelayCommand(RestoreAll);
         OpenSettingsCommand = new RelayCommand(OpenSettings);
+        OpenGlobalThemeStudioCommand = new RelayCommand(() => OpenThemeStudio(null));
+        ApplyGlobalThemeCommand = new RelayCommand(parameter =>
+        {
+            if (parameter is NoteTheme theme)
+            {
+                ApplyGlobalTheme(theme.Id);
+                OnPropertyChanged(nameof(GlobalThemeId));
+            }
+        });
         QuitCommand = new RelayCommand(Quit);
     }
 
@@ -167,6 +176,29 @@ public sealed class NotesManagerViewModel : ObservableObject
 
     public AssetService Assets => _assets;
 
+    public IReadOnlyList<NoteTheme> AvailableThemes => _themes.All;
+
+    public string GlobalThemeId
+    {
+        get => _settings.GlobalThemeId;
+        set
+        {
+            if (value is null || _settings.GlobalThemeId == value)
+            {
+                return;
+            }
+
+            ApplyGlobalTheme(value);
+            OnPropertyChanged();
+        }
+    }
+
+    public void RefreshThemeOptions()
+    {
+        OnPropertyChanged(nameof(AvailableThemes));
+        OnPropertyChanged(nameof(GlobalThemeId));
+    }
+
     public RelayCommand NewNoteCommand { get; }
 
     public RelayCommand OpenNoteCommand { get; }
@@ -180,6 +212,10 @@ public sealed class NotesManagerViewModel : ObservableObject
     public RelayCommand RestoreAllCommand { get; }
 
     public RelayCommand OpenSettingsCommand { get; }
+
+    public RelayCommand OpenGlobalThemeStudioCommand { get; }
+
+    public RelayCommand ApplyGlobalThemeCommand { get; }
 
     public RelayCommand QuitCommand { get; }
 
@@ -347,6 +383,8 @@ public sealed class NotesManagerViewModel : ObservableObject
         {
             return;
         }
+
+        OnPropertyChanged(nameof(GlobalThemeId));
 
         foreach (NoteViewModel vm in Notes)
         {
