@@ -8,16 +8,16 @@ Designed for students, developers, and anyone who wants quick references beside 
 
 ## Project status
 
-**Early development.** On `devin/dikit-v1-ios-notes`, M1–M4's desktop-integration scope is implemented and passed a Windows smoke test: editable sticky-note windows with typed content blocks (text, images, links, checklists), debounced autosave to local JSON, independent movable/resizable/minimizable note windows, close-as-hide, pin-to-top, window-state restoration with off-screen recovery, backups and quarantine recovery, a searchable All notes window, a system-tray menu, an opt-in launch-at-sign-in setting, single-instance activation, and a Theme Studio with presets and per-note/global customization. See [progress state](docs/PROGRESS_STATE.md) for verified coverage and remaining checks.
+**Early development.** On `main`, M1–M4's desktop-integration scope is implemented and passed a Windows smoke test: editable sticky-note windows with typed content blocks (text, images, links, checklists), debounced autosave to local JSON, independent movable/resizable/minimizable note windows, close-as-hide, stick-in-place positioning, window-state restoration with off-screen recovery, backups and quarantine recovery, a searchable All notes window, a system-tray menu, an opt-in launch-at-sign-in setting, single-instance activation, light/dark app appearance, and a Theme Studio with presets and per-note/global customization. See [progress state](docs/PROGRESS_STATE.md) for verified coverage and remaining checks.
 
-## Implemented (M1–M4, branch)
+## Implemented (M1–M4, main)
 
 - Create, edit, duplicate, and delete notes; deleting keeps a recoverable copy under `backups/deleted/`.
 - Typed content blocks per note: text, pasted or imported images stored under `notes/<id>/assets/`, `http`/`https`-only clickable links, and checklists with persistent checked state.
 - Paste (`Ctrl+V`) a screenshot to attach it, or a lone URL to create a link block; blocks are removable via a per-block remove button or right-click menu.
-- Independent note windows that restore position, size, open state, and pin status.
+- Independent note windows that restore position, size, open state, and a persistent Stick toggle that locks the note's position without forcing it above other windows.
 - Local storage under `%LOCALAPPDATA%\Dikit` (per-note JSON, manifest, settings, backups).
-- Theme Studio: presets (Classic Yellow, Lavender, Matcha, Sakura, Midnight), background/text/accent colors, font, corner radius, opacity, live preview, per-note overrides, and global themes saved under `themes/`.
+- Light/dark app appearance plus Theme Studio: Classic Light and Classic Dark built-ins, background/text/accent colors, font, corner radius, opacity, live preview, per-note overrides, and custom presets saved or deleted under `themes/`.
 - System tray icon with New note, All notes, Hide all, Restore all, Settings, and an explicit Quit. Closing any window keeps Dikit running in the tray.
 - Searchable All notes manager (titles, text, links, and captions) with per-note open/closed state and restore.
 - Settings window with an opt-in "launch at Windows sign-in" toggle (per-user `Run` registry value, no admin) and the per-note backup retention count.
@@ -32,7 +32,7 @@ See the [product requirements](docs/PRD/V1.0.md) for scope, acceptance criteria,
 
 ## Installation and local setup
 
-The current way to try Dikit is to build it from source. On this branch, `dotnet run` launches the All notes manager plus a system-tray icon; notes open as independent desktop windows and the app stays in the tray until Quit.
+The current way to try Dikit is to build it from source. On `main`, `dotnet run` launches the All notes manager plus a system-tray icon; notes open as independent desktop windows and the app stays in the tray until Quit.
 
 ### Requirements
 
@@ -50,7 +50,7 @@ Open PowerShell in the folder where you keep your projects:
 ```powershell
 git clone https://github.com/lncekent/dikit.git
 cd dikit
-git checkout devin/dikit-v1-ios-notes
+git checkout main
 dotnet restore
 dotnet build
 dotnet run
@@ -74,10 +74,10 @@ Use `dotnet run --no-build` only after a successful build. For setup checks and 
 | Milestone | Scope | Status |
 | --- | --- | --- |
 | M0: Foundation | Development environment, WPF starter window, Git, and README | Complete |
-| M1: Notes and persistence | Editable notes, local JSON storage, autosave, and window restoration | Implemented on `devin/dikit-v1-ios-notes` and Windows smoke-tested |
-| M2: Content blocks | Pasted images, safe website links, and checklists | Implemented on `devin/dikit-v1-ios-notes` and Windows smoke-tested |
-| M3: Theme Studio | Presets, live preview, and per-note customization | Implemented on `devin/dikit-v1-ios-notes` and Windows smoke-tested |
-| M4: Desktop integration and release | Tray controls, opt-in startup, recovery, and Windows distribution | Integration implemented on `devin/dikit-v1-ios-notes` and Windows smoke-tested; packaging planned |
+| M1: Notes and persistence | Editable notes, local JSON storage, autosave, and window restoration | Implemented on `main` and Windows smoke-tested |
+| M2: Content blocks | Pasted images, safe website links, and checklists | Implemented on `main` and Windows smoke-tested |
+| M3: Theme Studio | Presets, live preview, and per-note customization | Implemented on `main` and Windows smoke-tested |
+| M4: Desktop integration and release | Tray controls, opt-in startup, recovery, and Windows distribution | Integration implemented on `main` and Windows smoke-tested; packaging planned |
 
 ## Development
 
