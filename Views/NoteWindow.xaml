@@ -41,6 +41,7 @@
                          BorderThickness="0"
                          Background="Transparent"
                          Foreground="{Binding Theme.Foreground, Converter={StaticResource HexToBrush}}"
+                         CaretBrush="{Binding Theme.Foreground, Converter={StaticResource HexToBrush}}"
                          FontWeight="SemiBold"
                          FontSize="13"
                          TextWrapping="NoWrap"

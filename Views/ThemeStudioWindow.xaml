@@ -159,6 +159,7 @@
                          MinWidth="110"
                          Background="{DynamicResource AppSurfaceBrush}"
                          Foreground="{DynamicResource AppTextBrush}"
+                         CaretBrush="{DynamicResource AppTextBrush}"
                          BorderBrush="{DynamicResource AppBorderBrush}"
                          ToolTip="Hex color, e.g. #FFFFFFFF"
                          AutomationProperties.Name="Hex color value"/>
@@ -210,6 +211,7 @@
                              Margin="0,3,0,0"
                              Background="{DynamicResource AppSurfaceBrush}"
                              Foreground="{DynamicResource AppTextBrush}"
+                             CaretBrush="{DynamicResource AppTextBrush}"
                              BorderBrush="{DynamicResource AppBorderBrush}"
                              AutomationProperties.Name="Theme name"/>
                 </StackPanel>
