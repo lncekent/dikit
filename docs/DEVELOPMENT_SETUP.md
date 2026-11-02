@@ -220,9 +220,9 @@ Keep the source code, `.csproj`, `.xaml`, `.cs`, documentation, and any intentio
 
 ## 10. Current status and next milestone
 
-**Completed:** .NET 10 SDK recognized; C# tooling initialized; Dikit WPF project successfully launched. On `devin/dikit-v1-ios-notes`, M1–M3 plus M4 desktop integration are implemented and passed a Windows smoke test on .NET 10.0.403: `dotnet restore`/`dotnet build` pass; notes create/edit/move/resize/minimize/pin/hide/restore/duplicate/delete; text, pasted/imported images, links and checklists persist; Theme Studio, tray menu, All notes search, Settings, single-instance activation, launch-at-sign-in registration, corrupt-note backup recovery, forced-kill recovery, and restart persistence were exercised. The project enables `UseWindowsForms` for the tray icon using the shared Windows Desktop framework.
+**Completed:** .NET 10 SDK recognized; C# tooling initialized; Dikit WPF project successfully launched. On `main`, M1–M3 plus M4 desktop integration are implemented and passed a Windows smoke test on .NET 10.0.403: `dotnet restore`/`dotnet build` pass; notes create/edit/move/resize/minimize/hide/restore/duplicate/delete; text, pasted/imported images, links and checklists persist; Theme Studio, tray menu, All notes search, Settings, single-instance activation, launch-at-sign-in registration, corrupt-note backup recovery, forced-kill recovery, and restart persistence were exercised. The project enables `UseWindowsForms` for the tray icon using the shared Windows Desktop framework.
 
-**Next:** Merge or package the branch only after the remaining release checks in `docs/PROGRESS_STATE.md`: standalone executable launch without IDE/network, a 10-note workload, no-backup quarantine recovery, monitor-detach clamping, Wi-Fi-disabled use, RAM/storage/startup measurement, and Windows packaging/distribution.
+**Next:** Package only after the remaining release checks in `docs/PROGRESS_STATE.md`: standalone executable launch without IDE/network, a 10-note workload, no-backup quarantine recovery, monitor-detach clamping, Wi-Fi-disabled use, RAM/storage/startup measurement, and Windows packaging/distribution.
 
 ---
 
