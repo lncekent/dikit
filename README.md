@@ -8,7 +8,7 @@ Designed for students, developers, and anyone who wants quick references beside 
 
 ## Project status
 
-**Early development.** M1–M4's desktop-integration scope is implemented; the original scope passed a Windows smoke test, and the current appearance, Stick, and theme-preset changes still need targeted Windows verification. Dikit includes editable sticky-note windows with typed content blocks (text, images, links, checklists), debounced autosave to local JSON, independent movable/resizable/minimizable note windows, close-as-hide, stick-in-place positioning, window-state restoration with off-screen recovery, backups and quarantine recovery, a searchable All notes window, a system-tray menu, an opt-in launch-at-sign-in setting, single-instance activation, light/dark app appearance, and a Theme Studio with presets and per-note/global customization. See [progress state](docs/PROGRESS_STATE.md) for verified coverage and remaining checks.
+**Early development.** M1–M4's desktop-integration scope is implemented and Windows-verified, including the new appearance, Stick, and theme-preset behavior. Dikit includes editable sticky-note windows with typed content blocks (text, images, links, checklists), debounced autosave to local JSON, independent movable/resizable/minimizable note windows, close-as-hide, stick-in-place positioning, window-state restoration with off-screen recovery, backups and quarantine recovery, a searchable All notes window, a system-tray menu, an opt-in launch-at-sign-in setting, single-instance activation, light/dark app appearance, and a Theme Studio with presets and per-note/global customization. See [progress state](docs/PROGRESS_STATE.md) for verified coverage and remaining checks.
 
 ## Implemented (M1–M4)
 
