@@ -12,6 +12,7 @@
         <infra:TrueToCollapsedConverter x:Key="TrueToCollapsed"/>
         <infra:FontFamilyStringConverter x:Key="FontFamilyString"/>
         <infra:PathToBitmapConverter x:Key="PathToBitmap"/>
+        <infra:ThemeIdMatchConverter x:Key="ThemeIdMatch"/>
 
         <FontFamily x:Key="AppFont">./Resources/Fonts/#Inter, Segoe UI</FontFamily>
 

@@ -150,6 +150,7 @@ public partial class NoteWindow : Window
     {
         if (sender is System.Windows.Controls.Button button && button.ContextMenu is { } menu)
         {
+            _viewModel.RefreshThemeOptions();
             menu.PlacementTarget = button;
             menu.IsOpen = true;
         }

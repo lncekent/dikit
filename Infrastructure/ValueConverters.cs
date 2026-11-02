@@ -169,3 +169,17 @@ public sealed class PathToBitmapConverter : IValueConverter
         throw new NotSupportedException();
     }
 }
+
+public sealed class ThemeIdMatchConverter : IMultiValueConverter
+{
+    public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
+    {
+        return values.Length == 2
+            && string.Equals(values[0] as string, values[1] as string, StringComparison.OrdinalIgnoreCase);
+    }
+
+    public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+    {
+        throw new NotSupportedException();
+    }
+}
