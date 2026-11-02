@@ -34,11 +34,13 @@ public partial class App : System.Windows.Application
         AssetService assets = new AssetService(paths);
         NoteStore store = new NoteStore(paths, assets);
         ThemeService themes = new ThemeService(paths);
+        AppearanceService appearance = new AppearanceService();
         StartupService startup = new StartupService();
         StoreLoadResult loaded = store.LoadAll();
+        appearance.Apply(loaded.Settings.AppearanceMode);
         _manager = new NotesManagerViewModel(
             store, loaded.Notes, loaded.Warnings, loaded.Settings, assets, themes,
-            paths, startup, new WindowCoordinator());
+            appearance, paths, startup, new WindowCoordinator());
         _manager.SyncStartupOption();
 
         MainWindow launcher = new MainWindow { DataContext = _manager };

@@ -54,6 +54,13 @@ public sealed class ThemeStudioViewModel : ObservableObject
             _ => _note is not null);
         ApplyToAllCommand = new RelayCommand(ApplyGlobally);
         SaveAsPresetCommand = new RelayCommand(SaveAsPreset);
+        DeletePresetCommand = new RelayCommand(parameter =>
+        {
+            if (parameter is NoteTheme theme)
+            {
+                DeletePreset(theme);
+            }
+        }, parameter => parameter is NoteTheme { IsBuiltIn: false });
         ResetToInheritedCommand = new RelayCommand(
             _ => ResetToInherited(),
             _ => _note is not null);
@@ -92,9 +99,9 @@ public sealed class ThemeStudioViewModel : ObservableObject
 
     public IReadOnlyList<string> Palette { get; } = new List<string>
     {
-        "#FFF9DB", "#FDEFF3", "#F3EFFF", "#F1F7E8", "#E8F4FD", "#FFF4E3",
-        "#26282E", "#3B3A30", "#6B6B66", "#FFFFFF",
-        "#E8C547", "#E08DAC", "#A78BDB", "#8BAE62", "#6E8ACB", "#D9825F",
+        "#FFFFFFF2", "#F2F2F7", "#E5E5EA", "#E8F4FD", "#FDEFF3", "#F1F7E8",
+        "#1C1C1EF2", "#2C2C2E", "#3A3A3C", "#FFFFFF",
+        "#0A84FF", "#FF375F", "#BF5AF2", "#30D158", "#64D2FF", "#98989D",
     };
 
     public IReadOnlyList<string> FontNames { get; } = new List<string>
@@ -112,6 +119,8 @@ public sealed class ThemeStudioViewModel : ObservableObject
     public RelayCommand ApplyToAllCommand { get; }
 
     public RelayCommand SaveAsPresetCommand { get; }
+
+    public RelayCommand DeletePresetCommand { get; }
 
     public RelayCommand ResetToInheritedCommand { get; }
 
@@ -159,6 +168,24 @@ public sealed class ThemeStudioViewModel : ObservableObject
     {
         _themes.SaveUserTheme(Working);
         RefreshPresets();
+    }
+
+    private void DeletePreset(NoteTheme theme)
+    {
+        if (!_manager.DeleteUserTheme(theme))
+        {
+            RefreshPresets();
+            return;
+        }
+
+        RefreshPresets();
+        if (Working.Id == theme.Id)
+        {
+            NoteTheme classic = _themes.Resolve(ThemeCatalog.DefaultThemeId);
+            Working.CopyStyleFrom(classic);
+            Working.Id = classic.Id;
+            OnPropertyChanged(nameof(EditingColorHex));
+        }
     }
 
     private void ResetToInherited()

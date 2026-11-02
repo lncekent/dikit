@@ -74,6 +74,31 @@ public sealed class ThemeService
         return copy;
     }
 
+    public bool DeleteUserTheme(string themeId)
+    {
+        NoteTheme? theme = _userThemes.FirstOrDefault(item => item.Id == themeId);
+        if (theme is null)
+        {
+            return false;
+        }
+
+        try
+        {
+            string file = Path.Combine(_paths.ThemesDirectory, themeId + ".json");
+            if (File.Exists(file))
+            {
+                File.Delete(file);
+            }
+
+            _userThemes.Remove(theme);
+            return true;
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            return false;
+        }
+    }
+
     private void LoadUserThemes()
     {
         if (!Directory.Exists(_paths.ThemesDirectory))

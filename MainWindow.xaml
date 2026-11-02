@@ -11,7 +11,7 @@
         MinHeight="300"
         WindowStartupLocation="CenterScreen"
         FontFamily="{StaticResource AppFont}"
-        Background="#FFFDF5"
+        Background="{DynamicResource AppBackgroundBrush}"
         Icon="pack://application:,,,/Resources/dikit.ico">
 
     <Grid Margin="20">
@@ -23,34 +23,45 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <StackPanel>
-            <TextBlock Text="Dikit" FontSize="22" FontWeight="SemiBold" Foreground="#3B3A30"/>
-            <TextBlock Text="Stick your thoughts, your way."
-                       FontSize="12"
-                       Foreground="#8A8668"
-                       Margin="0,2,0,0"/>
-        </StackPanel>
+        <Grid>
+            <StackPanel>
+                <TextBlock Text="Dikit" FontSize="22" FontWeight="SemiBold"
+                           Foreground="{DynamicResource AppTextBrush}"/>
+                <TextBlock Text="Stick your thoughts, your way."
+                           FontSize="12"
+                           Foreground="{DynamicResource AppMutedTextBrush}"
+                           Margin="0,2,0,0"/>
+            </StackPanel>
+            <ToggleButton Style="{StaticResource AppToggle}"
+                          IsChecked="{Binding IsDarkAppearance, Mode=TwoWay}"
+                          HorizontalAlignment="Right"
+                          VerticalAlignment="Top"
+                          Content="Dark"
+                          ToolTip="Use dark app colors"
+                          AutomationProperties.Name="Dark mode"
+                          Foreground="{DynamicResource AppTextBrush}"/>
+        </Grid>
 
         <Border Grid.Row="1"
                 Margin="0,14,0,0"
                 Padding="10,8"
                 CornerRadius="10"
-                Background="#FFF3CD"
-                BorderBrush="#E8C547"
+                Background="{DynamicResource RecoveryBackgroundBrush}"
+                BorderBrush="{DynamicResource RecoveryBorderBrush}"
                 BorderThickness="1"
                 Visibility="{Binding LoadWarnings.Count, Converter={StaticResource ZeroToCollapsed}}">
             <StackPanel>
                 <TextBlock Text="Recovery notices"
                            FontWeight="SemiBold"
                            FontSize="12"
-                           Foreground="#6B5B1E"/>
+                           Foreground="{DynamicResource RecoveryTextBrush}"/>
                 <ItemsControl ItemsSource="{Binding LoadWarnings}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
                             <TextBlock Text="{Binding}"
                                        TextWrapping="Wrap"
                                        FontSize="11"
-                                       Foreground="#6B5B1E"
+                                       Foreground="{DynamicResource RecoveryTextBrush}"
                                        Margin="0,2,0,0"/>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
@@ -62,14 +73,15 @@
                 Margin="0,14,0,0"
                 Padding="1"
                 CornerRadius="10"
-                Background="#B3FFFFFF"
-                BorderBrush="#1F000000"
-                BorderThickness="1">
+                Background="{DynamicResource AppSurfaceBrush}"
+                BorderBrush="{DynamicResource AppBorderBrush}"
+                BorderThickness="1"
+                Opacity="0.8">
             <TextBox Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged, Delay=200}"
                      Padding="9,5"
                      FontSize="12"
                      Background="Transparent"
-                     Foreground="#3B3A30"
+                     Foreground="{DynamicResource AppTextBrush}"
                      BorderThickness="0"
                      ToolTip="Search titles, text, links, and captions"
                      AutomationProperties.Name="Search notes"/>
@@ -84,28 +96,27 @@
             <StackPanel Orientation="Horizontal">
                 <Button Style="{StaticResource ChromeButton}"
                         Command="{Binding NewNoteCommand}"
-                        Foreground="#3B3A30"
                         FontWeight="SemiBold"
                         Content="+ New note"/>
                 <Button Style="{StaticResource ChromeButton}"
                         Command="{Binding RestoreAllCommand}"
-                        Foreground="#6B6750"
+                        Foreground="{DynamicResource AppMutedTextBrush}"
                         Margin="6,0,0,0"
                         Content="Restore all"/>
                 <Button Style="{StaticResource ChromeButton}"
                         Command="{Binding HideAllCommand}"
-                        Foreground="#6B6750"
+                        Foreground="{DynamicResource AppMutedTextBrush}"
                         Margin="6,0,0,0"
                         Content="Hide all"/>
                 <Button Style="{StaticResource ChromeButton}"
                         Click="ThemeStudio_Click"
-                        Foreground="#6B6750"
+                        Foreground="{DynamicResource AppMutedTextBrush}"
                         Margin="6,0,0,0"
                         ToolTip="Global theme"
                         Content="Theme…"/>
                 <Button Style="{StaticResource ChromeButton}"
                         Command="{Binding OpenSettingsCommand}"
-                        Foreground="#6B6750"
+                        Foreground="{DynamicResource AppMutedTextBrush}"
                         Margin="6,0,0,0"
                         Content="Settings"/>
             </StackPanel>
@@ -117,8 +128,8 @@
                             <Border Margin="0,0,0,8"
                                     Padding="12,8"
                                     CornerRadius="10"
-                                    Background="#FFF9DB"
-                                    BorderBrush="#1F000000"
+                                    Background="{DynamicResource AppSurfaceBrush}"
+                                    BorderBrush="{DynamicResource AppBorderBrush}"
                                     BorderThickness="1">
                                 <Grid>
                                     <Grid.ColumnDefinitions>
@@ -129,9 +140,11 @@
                                         <TextBlock Text="{Binding Title, TargetNullValue='(untitled)'}"
                                                    FontSize="13"
                                                    FontWeight="SemiBold"
-                                                   Foreground="#3B3A30"
+                                                   Foreground="{DynamicResource AppTextBrush}"
                                                    TextTrimming="CharacterEllipsis"/>
-                                        <TextBlock FontSize="11" Foreground="#8A8668" Margin="0,2,0,0">
+                                        <TextBlock FontSize="11"
+                                                   Foreground="{DynamicResource AppMutedTextBrush}"
+                                                   Margin="0,2,0,0">
                                             <Run Text="{Binding StatusText, Mode=OneWay}"/>
                                             <Run Text="·"/>
                                             <Run Text="{Binding UpdatedText, Mode=OneWay}"/>
@@ -143,16 +156,15 @@
                                         <Button Style="{StaticResource ChromeButton}"
                                                 Command="{Binding DataContext.OpenNoteCommand, RelativeSource={RelativeSource AncestorType={x:Type Window}}}"
                                                 CommandParameter="{Binding}"
-                                                Foreground="#3B3A30"
                                                 Content="Open"/>
                                         <Button Style="{StaticResource ChromeButton}"
                                                 Command="{Binding DataContext.DuplicateNoteCommand, RelativeSource={RelativeSource AncestorType={x:Type Window}}}"
                                                 CommandParameter="{Binding}"
-                                                Foreground="#6B6750"
+                                                Foreground="{DynamicResource AppMutedTextBrush}"
                                                 Content="Duplicate"/>
                                         <Button Style="{StaticResource ChromeButton}"
                                                 Click="Delete_Click"
-                                                Foreground="#A33B3B"
+                                                Foreground="{DynamicResource AppDangerBrush}"
                                                 AutomationProperties.Name="{Binding Title, StringFormat='Delete note {0}'}"
                                                 Content="Delete"/>
                                     </StackPanel>
@@ -167,11 +179,11 @@
         <Grid Grid.Row="4" Margin="0,12,0,0">
             <TextBlock Text="Closing windows keeps Dikit in the tray — Quit exits."
                        FontSize="11"
-                       Foreground="#8A8668"
+                       Foreground="{DynamicResource AppMutedTextBrush}"
                        VerticalAlignment="Center"/>
             <Button Style="{StaticResource ChromeButton}"
                     Command="{Binding QuitCommand}"
-                    Foreground="#6B6750"
+                    Foreground="{DynamicResource AppMutedTextBrush}"
                     HorizontalAlignment="Right"
                     Content="Quit"/>
         </Grid>
