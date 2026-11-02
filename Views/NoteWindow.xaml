@@ -4,7 +4,7 @@
         xmlns:models="clr-namespace:dikit.Models"
         WindowStyle="None"
         AllowsTransparency="True"
-        ResizeMode="CanResizeWithGrip"
+        ResizeMode="CanResize"
         Background="Transparent"
         ShowInTaskbar="True"
         MinWidth="240"
@@ -54,14 +54,24 @@
                          FontSize="13"
                          TextWrapping="NoWrap"
                          VerticalContentAlignment="Center"
+                         LostFocus="Title_LostFocus"
                          AutomationProperties.Name="Note title"/>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
-                    <ToggleButton Style="{StaticResource AppToggle}"
-                                  IsChecked="{Binding IsStuck, Mode=TwoWay}"
+                    <ToggleButton IsChecked="{Binding IsStuck, Mode=TwoWay}"
                                   Foreground="{Binding Path=(TextElement.Foreground), RelativeSource={RelativeSource AncestorType={x:Type Grid}}}"
                                   ToolTip="Stick this note in place"
-                                  AutomationProperties.Name="Stick note in place"
-                                  Content="Stick"/>
+                                  AutomationProperties.Name="Stick note in place">
+                        <ToggleButton.Style>
+                            <Style TargetType="ToggleButton" BasedOn="{StaticResource AppToggle}">
+                                <Setter Property="Content" Value="Stick"/>
+                                <Style.Triggers>
+                                    <Trigger Property="IsChecked" Value="True">
+                                        <Setter Property="Content" Value="Unstick"/>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </ToggleButton.Style>
+                    </ToggleButton>
                     <Button Style="{StaticResource ChromeButton}"
                             Click="Minimize_Click"
                             Foreground="{Binding Path=(TextElement.Foreground), RelativeSource={RelativeSource AncestorType={x:Type Grid}}}"

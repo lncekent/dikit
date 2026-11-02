@@ -120,6 +120,14 @@ public partial class NoteWindow : Window
         }
     }
 
+    private void Title_LostFocus(object sender, RoutedEventArgs e)
+    {
+        if (sender is System.Windows.Controls.TextBox title)
+        {
+            title.ScrollToHome();
+        }
+    }
+
     private void Minimize_Click(object sender, RoutedEventArgs e)
     {
         WindowState = WindowState.Minimized;
