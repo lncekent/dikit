@@ -88,7 +88,7 @@ public sealed class NoteViewModel : ObservableObject
 
     public bool IsStuck
     {
-        get => _note.Window.IsStuck || _note.Window.AlwaysOnTop;
+        get => _note.Window.IsStuck;
         set
         {
             _note.Window.IsStuck = value;
