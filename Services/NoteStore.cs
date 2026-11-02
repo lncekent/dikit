@@ -92,13 +92,6 @@ public sealed class NoteStore
                 result.Warnings.Add($"Note '{id}' had a mismatched id in its file; it was corrected.");
             }
 
-            if (note.Window.AlwaysOnTop)
-            {
-                note.Window.IsStuck = true;
-                note.Window.AlwaysOnTop = false;
-                WriteNoteFile(note);
-            }
-
             result.Notes.Add(note);
         }
 
