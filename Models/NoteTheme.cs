@@ -7,9 +7,9 @@ public sealed class NoteTheme : ObservableObject
 {
     private string _id = string.Empty;
     private string _name = string.Empty;
-    private string _background = "#FFF9DB";
-    private string _foreground = "#3B3A30";
-    private string _accent = "#E8C547";
+    private string _background = "#FFFFFFF2";
+    private string _foreground = "#1C1C1E";
+    private string _accent = "#0A84FF";
     private string _fontFamily = "Inter";
     private double _cornerRadius = 14;
     private double _opacity = 1.0;

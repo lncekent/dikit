@@ -7,6 +7,7 @@ public sealed class AppSettings : ObservableObject
 {
     private int _schemaVersion = 1;
     private string _globalThemeId = ThemeCatalog.DefaultThemeId;
+    private string _appearanceMode = AppearanceModes.Light;
     private bool _launchAtSignIn;
     private int _backupRetention = 5;
     private double _defaultNoteWidth = 340;
@@ -24,6 +25,13 @@ public sealed class AppSettings : ObservableObject
     {
         get => _globalThemeId;
         set => SetProperty(ref _globalThemeId, value);
+    }
+
+    [JsonPropertyName("appearanceMode")]
+    public string AppearanceMode
+    {
+        get => _appearanceMode;
+        set => SetProperty(ref _appearanceMode, AppearanceModes.Normalize(value));
     }
 
     [JsonPropertyName("launchAtSignIn")]

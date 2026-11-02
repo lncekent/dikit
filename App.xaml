@@ -9,13 +9,28 @@
         <infra:DoubleToCornerRadiusConverter x:Key="ToCornerRadius"/>
         <infra:ZeroToCollapsedConverter x:Key="ZeroToCollapsed"/>
         <infra:NullToVisibleConverter x:Key="NullToVisible"/>
+        <infra:TrueToCollapsedConverter x:Key="TrueToCollapsed"/>
         <infra:FontFamilyStringConverter x:Key="FontFamilyString"/>
         <infra:PathToBitmapConverter x:Key="PathToBitmap"/>
 
         <FontFamily x:Key="AppFont">./Resources/Fonts/#Inter, Segoe UI</FontFamily>
 
+        <SolidColorBrush x:Key="AppBackgroundBrush" Color="#FFFDF5"/>
+        <SolidColorBrush x:Key="AppSurfaceBrush" Color="#FFFFFF"/>
+        <SolidColorBrush x:Key="AppSurfaceAltBrush" Color="#F4F2EA"/>
+        <SolidColorBrush x:Key="AppTextBrush" Color="#3B3A30"/>
+        <SolidColorBrush x:Key="AppMutedTextBrush" Color="#8A8668"/>
+        <SolidColorBrush x:Key="AppBorderBrush" Color="#1F000000"/>
+        <SolidColorBrush x:Key="AppHoverBrush" Color="#24000000"/>
+        <SolidColorBrush x:Key="AppCheckedBrush" Color="#3A000000"/>
+        <SolidColorBrush x:Key="AppDangerBrush" Color="#A33B3B"/>
+        <SolidColorBrush x:Key="RecoveryBackgroundBrush" Color="#FFF3CD"/>
+        <SolidColorBrush x:Key="RecoveryBorderBrush" Color="#E8C547"/>
+        <SolidColorBrush x:Key="RecoveryTextBrush" Color="#6B5B1E"/>
+
         <Style x:Key="ChromeButton" TargetType="ButtonBase">
             <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="{DynamicResource AppTextBrush}"/>
             <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="Padding" Value="7,2"/>
             <Setter Property="FontSize" Value="12"/>
@@ -31,7 +46,7 @@
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Background" Value="#24000000"/>
+                                <Setter Property="Background" Value="{DynamicResource AppHoverBrush}"/>
                             </Trigger>
                             <Trigger Property="IsEnabled" Value="False">
                                 <Setter Property="Opacity" Value="0.4"/>
@@ -62,11 +77,11 @@
                     <ControlTemplate TargetType="ButtonBase">
                         <Border CornerRadius="13"
                                 Background="{TemplateBinding Background}"
-                                BorderBrush="#22000000"
+                                BorderBrush="{DynamicResource AppBorderBrush}"
                                 BorderThickness="1"/>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="BorderBrush" Value="#80000000"/>
+                                <Setter Property="BorderBrush" Value="{DynamicResource AppTextBrush}"/>
                                 <Setter Property="BorderThickness" Value="1.5"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
@@ -75,8 +90,9 @@
             </Setter>
         </Style>
 
-        <Style x:Key="PinToggle" TargetType="ToggleButton">
+        <Style x:Key="AppToggle" TargetType="ToggleButton">
             <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="{DynamicResource AppTextBrush}"/>
             <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="Padding" Value="7,2"/>
             <Setter Property="FontSize" Value="11"/>
@@ -92,10 +108,10 @@
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Background" Value="#24000000"/>
+                                <Setter Property="Background" Value="{DynamicResource AppHoverBrush}"/>
                             </Trigger>
                             <Trigger Property="IsChecked" Value="True">
-                                <Setter Property="Background" Value="#3A000000"/>
+                                <Setter Property="Background" Value="{DynamicResource AppCheckedBrush}"/>
                             </Trigger>
                             <Trigger Property="IsEnabled" Value="False">
                                 <Setter Property="Opacity" Value="0.4"/>

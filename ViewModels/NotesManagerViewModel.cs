@@ -13,6 +13,7 @@ public sealed class NotesManagerViewModel : ObservableObject
     private readonly AppSettings _settings;
     private readonly AssetService _assets;
     private readonly ThemeService _themes;
+    private readonly AppearanceService _appearance;
     private readonly AppPaths _paths;
     private readonly StartupService _startup;
     private readonly WindowCoordinator _windows;
@@ -26,6 +27,7 @@ public sealed class NotesManagerViewModel : ObservableObject
         AppSettings settings,
         AssetService assets,
         ThemeService themes,
+        AppearanceService appearance,
         AppPaths paths,
         StartupService startup,
         WindowCoordinator windows)
@@ -34,6 +36,7 @@ public sealed class NotesManagerViewModel : ObservableObject
         _settings = settings;
         _assets = assets;
         _themes = themes;
+        _appearance = appearance;
         _paths = paths;
         _startup = startup;
         _windows = windows;
@@ -119,6 +122,24 @@ public sealed class NotesManagerViewModel : ObservableObject
 
             _settings.LaunchAtSignIn = value;
             _startup.SetEnabled(value);
+            _store.SaveSettings(_settings);
+            OnPropertyChanged();
+        }
+    }
+
+    public bool IsDarkAppearance
+    {
+        get => AppearanceModes.IsDark(_settings.AppearanceMode);
+        set
+        {
+            string mode = value ? AppearanceModes.Dark : AppearanceModes.Light;
+            if (_settings.AppearanceMode == mode)
+            {
+                return;
+            }
+
+            _settings.AppearanceMode = mode;
+            _appearance.Apply(mode);
             _store.SaveSettings(_settings);
             OnPropertyChanged();
         }
@@ -271,6 +292,38 @@ public sealed class NotesManagerViewModel : ObservableObject
     {
         _settings.GlobalThemeId = themeId;
         _store.SaveSettings(_settings);
+    }
+
+    public bool DeleteUserTheme(NoteTheme theme)
+    {
+        if (theme.IsBuiltIn || !_themes.DeleteUserTheme(theme.Id))
+        {
+            return false;
+        }
+
+        bool globalChanged = _settings.GlobalThemeId == theme.Id;
+        if (globalChanged)
+        {
+            _settings.GlobalThemeId = ThemeCatalog.DefaultThemeId;
+        }
+
+        foreach (NoteViewModel vm in Notes)
+        {
+            if (vm.Model.ThemeId == theme.Id)
+            {
+                vm.Model.ThemeId = ThemeCatalog.DefaultThemeId;
+                vm.SaveNow();
+            }
+
+            vm.RefreshTheme();
+        }
+
+        if (globalChanged)
+        {
+            _store.SaveSettings(_settings);
+        }
+
+        return true;
     }
 
     public void SyncStartupOption()
