@@ -26,6 +26,7 @@ public sealed class AppearanceService
 
     private static SolidColorBrush Brush(string hex)
     {
-        return new SolidColorBrush((Color)ColorConverter.ConvertFromString(hex));
+        return new SolidColorBrush(
+            (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(hex));
     }
 }
