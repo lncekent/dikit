@@ -82,6 +82,7 @@
                      FontSize="12"
                      Background="Transparent"
                      Foreground="{DynamicResource AppTextBrush}"
+                     CaretBrush="{DynamicResource AppTextBrush}"
                      BorderThickness="0"
                      ToolTip="Search titles, text, links, and captions"
                      AutomationProperties.Name="Search notes"/>

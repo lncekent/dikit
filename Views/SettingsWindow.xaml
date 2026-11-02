@@ -53,6 +53,7 @@
                      HorizontalContentAlignment="Center"
                      Background="{DynamicResource AppSurfaceBrush}"
                      Foreground="{DynamicResource AppTextBrush}"
+                     CaretBrush="{DynamicResource AppTextBrush}"
                      BorderBrush="{DynamicResource AppBorderBrush}"
                      AutomationProperties.Name="Backups kept per note"/>
         </StackPanel>
