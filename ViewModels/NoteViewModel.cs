@@ -32,6 +32,13 @@ public sealed class NoteViewModel : ObservableObject
         _assets = assets;
         _themes = themes;
 
+        // Treat the removed always-on-top flag as the predecessor of Stick.
+        if (_note.Window.AlwaysOnTop)
+        {
+            _note.Window.IsStuck = true;
+            _note.Window.AlwaysOnTop = false;
+        }
+
         CloseCommand = new RelayCommand(() => HideRequested?.Invoke(this));
         DuplicateCommand = new RelayCommand(() => DuplicateRequested?.Invoke(this));
         DeleteCommand = new RelayCommand(() => DeleteRequested?.Invoke(this));
