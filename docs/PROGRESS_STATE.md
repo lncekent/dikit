@@ -21,7 +21,7 @@
 - Borderless movable/resizable/minimizable `NoteWindow` with iOS Notes-inspired styling (Inter bundled under `Resources/Fonts/` with Segoe UI fallback, rounded card, subtle border and shadow).
 - Text editing with debounced (~400 ms) autosave; title editing; create, duplicate, delete (with confirmation and a recoverable copy), close-as-hide, and a persistent Stick toggle.
 - Window geometry captured and restored with off-screen clamping to the virtual screen; open state persists so notes reopen on next launch. `isStuck` prevents title-bar moving while retaining normal window activation and resize behavior; legacy `alwaysOnTop` flags normalize to Stick on the next save.
-- `MainWindow` acts only as a host/launcher: note list with open status, New note, Restore all, Hide all, Quit, and recovery notices. The header ⋯ opens the launcher settings menu: "Default note theme" submenu (every preset, global choice checked), "Customize theme…" (global Theme Studio), a dark-appearance toggle, and "All settings…".
+- `MainWindow` acts only as a host/launcher: note list with open status, New note, Open all, Hide all, Quit, and recovery notices. The header ⋯ opens the launcher settings menu: "Default note theme" submenu (every preset, global choice checked), "Customize theme…" (global Theme Studio), a dark-appearance toggle, and "All settings…".
 - Classic Light and Classic Dark built-in themes are defined and resolved per note; retired built-in IDs still resolve for existing persisted references but are not selectable. Per-note `themeOverride` and global `globalThemeId` are persisted.
 
 ## Implemented (M2)

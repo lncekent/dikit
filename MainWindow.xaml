@@ -137,7 +137,7 @@
                         Command="{Binding RestoreAllCommand}"
                         Foreground="{DynamicResource AppMutedTextBrush}"
                         Margin="6,0,0,0"
-                        Content="Restore all"/>
+                        Content="Open all"/>
                 <Button Style="{StaticResource ChromeButton}"
                         Command="{Binding HideAllCommand}"
                         Foreground="{DynamicResource AppMutedTextBrush}"
